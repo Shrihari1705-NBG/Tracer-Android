@@ -1,34 +1,33 @@
-# Walkthrough - StatusCard UI Component
+# Walkthrough - BottomNavBar UI Component
 
-I have successfully implemented the `StatusCard` reusable UI component, incorporating all refined design and accessibility requirements.
+I have successfully implemented the `BottomNavBar` reusable UI component, ensuring it is prepared for future navigation integration and adheres to the Tracer brand and Material 3 design requirements.
 
 ## Changes Made
 
 ### UI Components
 
-#### [StatusCard.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/components/StatusCard.kt)
-- **Architecture**: Created a stateless `@Composable` function using an `ElevatedCard` as the root container.
+#### [BottomNavBar.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/components/BottomNavBar.kt)
+- **Model Architecture**:
+    - Created a `BottomNavItem` sealed class that includes a `route`, `label`, and `icon`.
+    - Added a `companion object` with a centralized `items` list to simplify the UI generation and maintenance.
+    - Used `Icons.AutoMirrored.Rounded.BluetoothSearching` to follow modern Material Icon standards and resolve deprecation warnings.
 - **Visual Design**:
-    - Implemented a **16dp** corner radius and **3dp** (Level 2) elevation.
-    - Used **20dp** internal padding for a spacious, professional feel.
-    - Added a circular status indicator with customizable `statusColor`.
-- **Resilience**:
-    - Used `Alignment.Top` in the status `Row` to ensure that long, multi-line status text wraps naturally while keeping the indicator aligned with the first line.
-    - Standardized spacing (12dp) between title and content.
-- **Accessibility**:
-    - Added `semantics { contentDescription = "..." }` to the status indicator box to provide context to screen readers.
-- **Preview Support**: Added three previews covering different states:
-    - **Bluetooth Disabled**: Demonstrates error state with `TracerError`.
-    - **Scanner Ready**: Demonstrates success state with a green indicator (includes a TODO for future theme expansion).
-    - **Current Location**: Demonstrates informational state with `TracerPrimary` and multi-line text support.
+    - Implemented a stateless `BottomNavBar` using Material 3 `NavigationBar` and `NavigationBarItem`.
+    - Explicitly configured colors using `NavigationBarItemDefaults.colors()` to lock in `TracerPrimary` for active states and `primaryContainer` for the selection indicator.
+- **Architectural Notes**:
+    - Added KDoc documentation explicitly stating that the component is "dumb" and only emits selection events, decoupling it from navigation logic.
+- **Preview Support**: Added four private preview functions to verify the visual state of the navbar for each possible selection (`Home`, `Scan`, `Navigate`, `Settings`).
+
+### Infrastructure
+- Added `androidx.compose.material:material-icons-extended` to `libs.versions.toml` and `app/build.gradle.kts` to support the `BluetoothSearching` and `Explore` icons.
 
 ## Verification Results
 
 ### Visual Inspection (Preview)
-- [x] Correct corner radius (16dp) and elevation.
-- [x] Indicator is a perfect circle.
-- [x] Multi-line status text wraps correctly without breaking the layout.
-- [x] Typography matches `titleMedium` and `bodyMedium`.
+- [x] All four selection states (`Home`, `Scan`, `Navigate`, `Settings`) render correctly with proper branding colors.
+- [x] Icons are correctly displayed using the `Rounded` style.
+- [x] The selection indicator (`primaryContainer`) correctly highlights the active item.
 
-### Accessibility Verification
-- [x] Content description is correctly generated based on the `status` parameter.
+### Functionality
+- [x] `onItemSelected` callback is correctly invoked when a new item is selected.
+- [x] The component is stateless and respects the `selectedItem` parameter passed from the parent.

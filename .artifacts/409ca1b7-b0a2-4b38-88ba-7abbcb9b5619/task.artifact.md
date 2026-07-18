@@ -1,15 +1,10 @@
-# Tasks - StatusCard Implementation
+# Tasks - BottomNavBar Implementation
 
 - [x] Implementation
-    - [x] Implement `StatusCard` in `ui/components/StatusCard.kt`
-    - [x] Add `@Preview` for Bluetooth Disabled
-    - [x] Add `@Preview` for Scanner Ready
-    - [x] Add `@Preview` for Current Location
+    - [x] Define `BottomNavItem` sealed class with `route` and `companion object`
+    - [x] Implement `BottomNavBar` with explicit M3 colors
+    - [x] Add 4 private selection-state `@Preview` functions
 - [x] Verification
-    - [x] Verify layout and spacing in Previews
-    - [x] Verify circular indicator shape and size
-    - [x] Verify typography and colors
-    - [x] Verify multi-line text wrapping behavior
-    - [ ] Verify layout and spacing in Previews
-    - [ ] Verify circular indicator shape and size
-    - [ ] Verify typography and colors
+    - [x] Verify selection states in Previews
+    - [x] Verify icon, label, and route consistency
+    - [x] Verify architectural KDoc notes
