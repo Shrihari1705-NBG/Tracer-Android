@@ -160,12 +160,12 @@ The project is based on extensive research in:
 
 ---
 
-# 👨‍💻 Developer
+# 👨‍💻 Developers
 
-**Shrihari N B G**
-**Shreesha M Tembe**
-**Shubhangi S Naik**
-**Vageesh I Gaonkar**
+**Shrihari N B G**\n
+**Shreesha M Tembe**\n
+**Shubhangi S Naik**\n
+**Vageesh I Gaonkar**\n
 
 Final Year Engineering Students
 
