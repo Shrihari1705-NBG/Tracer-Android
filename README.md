@@ -1,18 +1,7 @@
 <p align="center">
-  <img src="branding/logo/tracer-logo.png" alt="Tracer Logo" width="180">
-</p>
-<p align="center">
-
-<img src="https://img.shields.io/badge/Platform-Android-green"/>
-
-<img src="https://img.shields.io/badge/Kotlin-2.2-blue"/>
-
-<img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4"/>
-
-<img src="https://img.shields.io/badge/Architecture-MVVM-orange"/>
-
-<img src="https://img.shields.io/badge/Status-Under%20Development-red"/>
-
+    <img src="branding/logo/tracer-logo.png"
+         alt="Tracer Logo"
+         width="180"/>
 </p>
 
 <h1 align="center">Tracer</h1>
@@ -23,6 +12,14 @@
 
 <p align="center">
 AI-Based BLE RSSI Fingerprinting Indoor Localization and Navigation System
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Android-green" alt="Android"/>
+  <img src="https://img.shields.io/badge/Kotlin-2.2-blue" alt="Kotlin"/>
+  <img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4" alt="Jetpack Compose"/>
+  <img src="https://img.shields.io/badge/Architecture-MVVM-orange" alt="MVVM"/>
+  <img src="https://img.shields.io/badge/Status-Under%20Development-red" alt="Status"/>
 </p>
 
 Tracer is an AI-powered Android application that provides **BLE RSSI Fingerprinting-based Indoor Localization** and **Indoor Navigation** for smart campus environments.
@@ -114,7 +111,7 @@ for
 
 # 📱 Screenshots
 
-Coming Soon
+Application screenshots will be added as development progresses.
 
 ---
 
@@ -184,12 +181,32 @@ Final Year Engineering Students
 
 # 📄 License
 
-This project is currently intended for educational and research purposes.
+This repository is currently maintained for academic and research purposes.
 
-License to be added.
+An open-source license may be added in the future.
 
 ---
 
 # ⭐ Project Status
 
-🚧 Under Active Development
+## 🚧 Development Status
+
+- [x] Project Initialization
+- [x] Navigation Compose
+- [x] MVVM Architecture
+- [x] Hilt Integration
+- [x] Tracer Branding
+- [x] Typography
+- [ ] Splash Screen
+- [ ] Home Screen
+- [ ] BLE Scanner
+- [ ] RSSI Fingerprinting
+- [ ] Localization
+- [ ] Indoor Navigation
+- [ ] AR Navigation
+
+---
+
+⭐ If you find this project interesting, consider giving it a star.
+
+Built with ❤️ using Kotlin and Jetpack Compose.
