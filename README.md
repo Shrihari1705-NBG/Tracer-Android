@@ -165,7 +165,7 @@ The project is based on extensive research in:
 **Shrihari N B G**\
 **Shreesha M Tembe**\
 **Shubhangi S Naik**\
-**Vageesh I Gaonkar**\
+**Vageesh I Gaonkar**
 
 Final Year Engineering Students
 
