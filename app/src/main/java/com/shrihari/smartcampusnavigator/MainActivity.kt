@@ -17,7 +17,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            TracerTheme {
+            TracerTheme (
+                darkTheme = false
+            ){
                 AppNavigation()
             }
         }

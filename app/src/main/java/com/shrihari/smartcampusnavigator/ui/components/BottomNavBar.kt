@@ -77,27 +77,26 @@ sealed class BottomNavItem(
  * @param onItemSelected Callback invoked when a different [BottomNavItem] is tapped.
  * @param modifier The modifier to be applied to the navigation bar.
  */
-@Composable
+
+
+ @Composable
 fun BottomNavBar(
     selectedItem: BottomNavItem,
     onItemSelected: (BottomNavItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    NavigationBar(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-    ) {
-        BottomNavItem.items.forEach { item ->
-            val isSelected = selectedItem.route == item.route
-            
+    val items = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.Scan,
+        BottomNavItem.Navigate,
+        BottomNavItem.Settings
+    )
+
+    NavigationBar {
+        items.forEach { item ->
             NavigationBarItem(
-                selected = isSelected,
-                onClick = {
-                    if (!isSelected) {
-                        onItemSelected(item)
-                    }
-                },
+                selected = selectedItem.route == item.route,
+                onClick = {},
                 icon = {
                     Icon(
                         imageVector = item.icon,
@@ -105,22 +104,13 @@ fun BottomNavBar(
                     )
                 },
                 label = {
-                    Text(
-                        text = item.label,
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                    Text(item.label)
+                }
             )
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

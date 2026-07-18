@@ -5,6 +5,6 @@ import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor() : HomeRepository {
     override suspend fun getWelcomeMessage(): String {
-        return "Welcome from Repository via MVVM!"
+        return "Ready to navigate your campus?"
     }
 }

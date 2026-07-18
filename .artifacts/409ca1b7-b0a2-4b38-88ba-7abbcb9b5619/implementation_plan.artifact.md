@@ -1,44 +1,48 @@
-# Implementation Plan - BottomNavBar UI Component (Refined)
+# Implementation Plan - HomeScreen Refactoring
 
-Create a reusable and stateless `BottomNavBar` using Material 3 for the Tracer application, incorporating specific refinements for architectural cleanliness and future-proofing.
+Refactor the `HomeScreen` to use a centralized UI state, updated ViewModel, and reusable Tracer branding components.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> The `BottomNavItem` model now includes a `route` property to prepare for future Navigation Compose integration.
-> The UI uses explicit Material 3 color tokens to lock in the Tracer brand identity.
+> The `HomeScreen` will now strictly use custom Tracer components (`TracerTopBar`, `WelcomeBanner`, etc.) and a centralized `HomeUiState`.
+> The `HomeViewModel` will transition from exposing a single string to a full `HomeUiState` object.
 
 ## Proposed Changes
 
-### UI Components
+### 1. View Model & State
 
-#### [MODIFY] [BottomNavBar.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/components/BottomNavBar.kt)
-- **Model**: `sealed class BottomNavItem(val route: String, val label: String, val icon: ImageVector)`
-    - `object Home : BottomNavItem("home", "Home", Icons.Rounded.Home)`
-    - `object Scan : BottomNavItem("scan", "Scan", Icons.Rounded.BluetoothSearching)`
-    - `object Navigate : BottomNavItem("navigate", "Navigate", Icons.Rounded.Explore)`
-    - `object Settings : BottomNavItem("settings", "Settings", Icons.Rounded.Settings)`
-    - `companion object { val items = listOf(...) }`
-- **Composable**: `BottomNavBar`
-    - Uses `BottomNavItem.items` to generate `NavigationBarItem`s.
-    - Explicitly configures colors using `NavigationBarItemDefaults.colors()`.
-    - Includes architectural KDoc notes.
-- **Previews**:
-    - `private fun BottomNavBarHomePreview()`
-    - `private fun BottomNavBarScanPreview()`
-    - `private fun BottomNavBarNavigatePreview()`
-    - `private fun BottomNavBarSettingsPreview()`
+#### [NEW] [HomeUiState.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/viewmodel/HomeUiState.kt)
+- Define `data class HomeUiState` with properties for Bluetooth, Scanner, Location status, and Selected Nav Item.
+
+#### [MODIFY] [HomeViewModel.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/viewmodel/HomeViewModel.kt)
+- Replace `_welcomeMessage` with `_uiState: MutableStateFlow<HomeUiState>`.
+- Update state on initialization (using placeholder values for now).
+
+### 2. UI Screens
+
+#### [MODIFY] [HomeScreen.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/screens/home/HomeScreen.kt)
+- Split into `HomeScreen` (Stateful) and `HomeScreenContent` (Stateless).
+- **HomeScreen**:
+    - Inject `HomeViewModel` via Hilt.
+    - Collect `uiState` with `collectAsStateWithLifecycle()`.
+- **HomeScreenContent**:
+    - Use `Scaffold` with custom `BottomNavBar`.
+    - Content: `Column` with `verticalScroll`.
+    - Assemble components: `TracerTopBar`, `WelcomeBanner`, `StatusCard` (x3), `PrimaryButton`.
+- **Preview**: Add `HomeScreenContentPreview` with sample data.
 
 ## Design Decisions
 
-- **Architectural Separation**: The component is strictly a "dumb" UI element. It emits selection events but does not handle navigation logic, maintaining a clear separation of concerns.
-- **Future Ready**: Inclusion of the `route` property ensures that when Navigation Compose is added, the model won't need breaking changes.
-- **Maintenance**: The `companion object` list centralizes the navigation structure, making it trivial to add or remove items in one place.
-- **Theme Lock**: Using `primaryContainer` for the selection indicator and `primary` for active state ensures the bottom navigation bar is a prominent part of the Tracer visual experience.
+- **Single Source of Truth**: `HomeUiState` prevents state fragmentation and race conditions.
+- **Component Reusability**: Hard-coding is removed in favor of `TracerTopBar`, `WelcomeBanner`, etc., ensuring brand consistency.
+- **Scrollable Layout**: A vertically scrollable column is used to handle various screen sizes and future content growth.
+- **Separation of Concerns**: `HomeScreen` handles the "How" (Hilt, Lifecycle), while `HomeScreenContent` handles the "What" (UI layout).
 
 ## Verification Plan
 
 ### Manual Verification
-- Verify that all four previews render correctly in Android Studio.
-- Ensure the selection indicator uses `primaryContainer` and icons/text use `primary`.
-- Verify that clicking an item in interactive mode correctly triggers the `onItemSelected` callback.
+- Render the `HomeScreenContentPreview` in Android Studio.
+- Verify the components appear in the requested order: TopBar -> Welcome -> Status Cards -> Button.
+- Verify that clicking navigation items or the "Start Scan" button (simulated via `println` or similar) works in interactive mode.
+- Deploy the app and verify the Splash screen transitions to the new Home layout.
