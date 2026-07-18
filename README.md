@@ -1,7 +1,15 @@
 <p align="center">
-  <img src="branding/logo/tracer-logo.png"
-       alt="Tracer Logo"
-       width="180">
+
+<img src="https://img.shields.io/badge/Platform-Android-green"/>
+
+<img src="https://img.shields.io/badge/Kotlin-2.2-blue"/>
+
+<img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4"/>
+
+<img src="https://img.shields.io/badge/Architecture-MVVM-orange"/>
+
+<img src="https://img.shields.io/badge/Status-Under%20Development-red"/>
+
 </p>
 
 <h1 align="center">Tracer</h1>
