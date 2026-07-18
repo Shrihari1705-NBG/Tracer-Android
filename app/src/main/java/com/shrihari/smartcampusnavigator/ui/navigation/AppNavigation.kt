@@ -1,11 +1,13 @@
 package com.shrihari.smartcampusnavigator.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.shrihari.smartcampusnavigator.ui.screens.home.HomeScreen
 import com.shrihari.smartcampusnavigator.ui.screens.splash.SplashScreen
+import com.shrihari.smartcampusnavigator.ui.viewmodel.HomeViewModel
 
 @Composable
 fun AppNavigation() {
@@ -19,7 +21,8 @@ fun AppNavigation() {
             SplashScreen(navController = navController)
         }
         composable(route = Screen.Home.route) {
-            HomeScreen()
+            val homeViewModel: HomeViewModel = hiltViewModel()
+            HomeScreen(viewModel = homeViewModel)
         }
     }
 }

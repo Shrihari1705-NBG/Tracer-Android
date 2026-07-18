@@ -18,5 +18,16 @@
     - [x] Create Data layer packages
     - [x] Create Domain layer packages
     - [x] Create DI, UI components, Viewmodel, and Utils packages
-    - [ ] Run build to verify dependencies
-    - [ ] Verify UI flow (Manual)
+- [x] Hilt Foundation (Phase 2)
+    - [x] Create SmartCampusApp.kt
+    - [x] Update AndroidManifest.xml
+    - [x] Annotate MainActivity with @AndroidEntryPoint
+- [x] MVVM Home Feature Implementation
+    - [x] Update dependencies for Lifecycle Compose
+    - [x] Create `HomeRepository` (Domain)
+    - [x] Create `HomeRepositoryImpl` (Data)
+    - [x] Create `RepositoryModule` (DI)
+    - [x] Create `HomeViewModel` (UI)
+    - [x] Update `HomeScreen.kt` (using collectAsStateWithLifecycle)
+    - [x] Update `AppNavigation.kt`
+    - [x] Verification

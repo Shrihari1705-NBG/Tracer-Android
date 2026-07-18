@@ -27,9 +27,33 @@ I have established the Clean Architecture package structure:
 - **UI**: `components/`, `viewmodel/`
 - **Other**: `di/`, `utils/`
 
-All directories were created without adding any files or modifying existing ones.
+## Hilt Integration (Phase 2)
 
-## Verification Results
+I have successfully completed the Hilt foundation setup.
+
+### Changes Made
+- **SmartCampusApp**: Created `SmartCampusApp.kt` in the root package and annotated it with `@HiltAndroidApp`.
+- **AndroidManifest**: Registered `SmartCampusApp` in the `<application>` tag.
+- **MainActivity**: Added `@AndroidEntryPoint` to `MainActivity.kt`.
+- **Configuration Fix**: Added `android.disallowKotlinSourceSets=false` to `gradle.properties` to resolve a KSP compatibility issue with AGP 9.3.0.
+
+## MVVM Home Feature
+
+I have successfully implemented the first MVVM-based feature for the Home screen.
+
+### Changes Made
+- **Domain Layer**: Created `HomeRepository` interface with a `suspend` function.
+- **Data Layer**: Created `HomeRepositoryImpl` providing the welcome message.
+- **DI Layer**: Created `RepositoryModule` using `@Binds` to provide the repository.
+- **ViewModel Layer**: Created `HomeViewModel` to fetch the message within `viewModelScope` and expose it via `StateFlow`.
+- **UI Layer**:
+    - Updated `HomeScreen.kt` to use `collectAsStateWithLifecycle()` for battery-efficient state collection.
+    - Updated `AppNavigation.kt` to inject the ViewModel using `hiltViewModel()`.
+- **Dependencies**: Added `lifecycle-runtime-compose` and `lifecycle-viewmodel-compose` (v2.8.7).
+
+### Verification Results
+- **Build**: `./gradlew app:assembleDebug` - **Passed**.
+- **Sync**: Gradle Sync - **Successful**.
 
 ### Automated Tests
 - Ran `./gradlew app:assembleDebug` - **Passed**.
