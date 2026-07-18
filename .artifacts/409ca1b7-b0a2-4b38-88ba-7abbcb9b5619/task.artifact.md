@@ -1,33 +1,15 @@
-# Tasks - Navigation Compose Implementation
+# Tasks - StatusCard Implementation
 
-- [x] Update dependencies
-    - [x] Add navigation-compose to `libs.versions.toml`
-    - [x] Add dependency to `app/build.gradle.kts`
-- [x] Create Navigation structure
-    - [x] Create `ui/navigation/Screen.kt`
-    - [x] Create `ui/navigation/AppNavigation.kt`
-- [x] Create Screens
-    - [x] Create `ui/screens/splash/SplashScreen.kt`
-    - [x] Create `ui/screens/home/HomeScreen.kt`
-- [x] Integrate into MainActivity
-    - [x] Update `MainActivity.kt` to use `AppNavigation()`
+- [x] Implementation
+    - [x] Implement `StatusCard` in `ui/components/StatusCard.kt`
+    - [x] Add `@Preview` for Bluetooth Disabled
+    - [x] Add `@Preview` for Scanner Ready
+    - [x] Add `@Preview` for Current Location
 - [x] Verification
-    - [x] Run build to verify dependencies
-    - [x] Verify UI flow (Manual)
-- [x] Create Package Structure
-    - [x] Create Data layer packages
-    - [x] Create Domain layer packages
-    - [x] Create DI, UI components, Viewmodel, and Utils packages
-- [x] Hilt Foundation (Phase 2)
-    - [x] Create SmartCampusApp.kt
-    - [x] Update AndroidManifest.xml
-    - [x] Annotate MainActivity with @AndroidEntryPoint
-- [x] MVVM Home Feature Implementation
-    - [x] Update dependencies for Lifecycle Compose
-    - [x] Create `HomeRepository` (Domain)
-    - [x] Create `HomeRepositoryImpl` (Data)
-    - [x] Create `RepositoryModule` (DI)
-    - [x] Create `HomeViewModel` (UI)
-    - [x] Update `HomeScreen.kt` (using collectAsStateWithLifecycle)
-    - [x] Update `AppNavigation.kt`
-    - [x] Verification
+    - [x] Verify layout and spacing in Previews
+    - [x] Verify circular indicator shape and size
+    - [x] Verify typography and colors
+    - [x] Verify multi-line text wrapping behavior
+    - [ ] Verify layout and spacing in Previews
+    - [ ] Verify circular indicator shape and size
+    - [ ] Verify typography and colors
