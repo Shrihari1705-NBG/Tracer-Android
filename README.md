@@ -163,8 +163,11 @@ The project is based on extensive research in:
 # 👨‍💻 Developer
 
 **Shrihari N B G**
+**Shreesha M Tembe**
+**Shubhangi S Naik**
+**Vageesh I Gaonkar**
 
-Final Year Engineering Student
+Final Year Engineering Students
 
 ---
 
