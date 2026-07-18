@@ -1,0 +1,18 @@
+# Tasks - Navigation Compose Implementation
+
+- [x] Update dependencies
+    - [x] Add navigation-compose to `libs.versions.toml`
+    - [x] Add dependency to `app/build.gradle.kts`
+- [x] Create Navigation structure
+    - [x] Create `ui/navigation/Screen.kt`
+    - [x] Create `ui/navigation/AppNavigation.kt`
+- [x] Create Screens
+    - [x] Create `ui/screens/splash/SplashScreen.kt`
+    - [x] Create `ui/screens/home/HomeScreen.kt`
+- [x] Integrate into MainActivity
+    - [x] Update `MainActivity.kt` to use `AppNavigation()`
+- [x] Verification
+    - [x] Run build to verify dependencies
+    - [x] Verify UI flow (Manual)
+    - [ ] Run build to verify dependencies
+    - [ ] Verify UI flow (Manual)
