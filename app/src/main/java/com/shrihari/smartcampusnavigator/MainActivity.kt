@@ -5,16 +5,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.shrihari.smartcampusnavigator.ui.navigation.AppNavigation
-import com.shrihari.smartcampusnavigator.ui.theme.SmartCampusNavigatorTheme
+import com.shrihari.smartcampusnavigator.ui.theme.TracerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
-            SmartCampusNavigatorTheme {
+            TracerTheme {
                 AppNavigation()
             }
         }

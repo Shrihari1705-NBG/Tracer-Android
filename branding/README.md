@@ -55,3 +55,6 @@ The branding directory will evolve to include:
 - Wear OS design specifications.
 - AR navigation visual cues and markers.
 - Dark theme specific asset variations.
+
+---
+

@@ -20,7 +20,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Smart Campus Navigator") },
+                title = { Text("Tracer: Smart Campus Navigator") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
