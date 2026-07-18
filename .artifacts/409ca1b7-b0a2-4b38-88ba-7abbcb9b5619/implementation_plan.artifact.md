@@ -1,54 +1,42 @@
-# Implementation Plan - Navigation Compose (Final)
+# Implementation Plan - Project Package Structure
 
-Implement Navigation Compose using a type-safe `sealed class` for routing, following a clean package structure and Material 3 design principles.
+Establish a Clean Architecture package structure for the SmartCampusNavigator project.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> I will use the latest stable Navigation Compose (2.8.5 or higher as per version lookup).
-> The `HomeScreen` will be implemented using a Material 3 `Scaffold` with a `TopAppBar`.
+> [!NOTE]
+> This plan focuses purely on directory creation and package organization. No business logic or frameworks (like Hilt or Room) will be implemented at this stage.
 
 ## Proposed Changes
 
-### Build Configuration
+### Architecture Overview
 
-#### [MODIFY] [libs.versions.toml](file:///D:/ENGG/MajorProject/SmartCampusNavigator/gradle/libs.versions.toml)
-- Add `navigationCompose = "2.8.5"` (latest stable) to `[versions]`.
-- Add `androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }` to `[libraries]`.
+I will create the following package hierarchy under `app/src/main/java/com/shrihari/smartcampusnavigator/`:
 
-#### [MODIFY] [build.gradle.kts](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/build.gradle.kts)
-- Add `implementation(libs.androidx.navigation.compose)` to the dependencies.
+#### **Data Layer (`data/`)**
+The implementation details of how the app handles data.
+- **`ble/`**: Logic for interacting with Bluetooth Low Energy devices (beacons, sensors).
+- **`database/`**: Local storage implementation (e.g., Room database classes).
+- **`datasource/`**: Interfaces and classes that fetch data from specific sources (Network, Local DB, BLE).
+- **`model/`**: Data-specific models such as API DTOs or Database Entities.
+- **`repository/`**: Concrete implementations of the Repository interfaces defined in the Domain layer.
 
-### Navigation
+#### **Domain Layer (`domain/`)**
+The core business logic, independent of any external frameworks or UI.
+- **`model/`**: Clean domain models used across the app's business logic and UI.
+- **`repository/`**: Interfaces that define what data is needed, without specifying how it's fetched.
+- **`usecase/`**: Individual business logic units (e.g., `GetCampusMapUseCase`).
 
-#### [NEW] [Screen.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/navigation/Screen.kt)
-- Define `sealed class Screen(val route: String)` with `Splash` and `Home` objects.
+#### **Presentation Layer (`ui/`)**
+- **`components/`**: Reusable Compose widgets shared across multiple screens.
+- **`viewmodel/`**: State holders that connect the UI screens to the Domain UseCases.
 
-#### [NEW] [AppNavigation.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/navigation/AppNavigation.kt)
-- Implement `AppNavigation` composable with `rememberNavController()` and `NavHost`.
-
-### Screens
-
-#### [NEW] [SplashScreen.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/screens/splash/SplashScreen.kt)
-- Minimal M3 Splash UI (e.g., a centered icon or text).
-- `LaunchedEffect` delay of 2000ms to navigate to `Screen.Home.route`, popping the Splash screen.
-
-#### [NEW] [HomeScreen.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/ui/screens/home/HomeScreen.kt)
-- **Scaffold**: Material 3 Scaffold implementation.
-- **TopAppBar**: Title "Smart Campus Navigator".
-- **Content**: Centered welcome message with modern layout and M3 spacing.
-
-### Main Entry Point
-
-#### [MODIFY] [MainActivity.kt](file:///D:/ENGG/MajorProject/SmartCampusNavigator/app/src/main/java/com/shrihari/smartcampusnavigator/MainActivity.kt)
-- Replace default setup with `AppNavigation()`.
+#### **Infrastructure & Utilities**
+- **`di/`**: Placeholder for Dependency Injection modules.
+- **`utils/`**: Helper classes, extensions, and constants.
 
 ## Verification Plan
 
-### Automated Tests
-- Build project using `./gradlew assembleDebug`.
-
 ### Manual Verification
-- Deploy and verify 2s Splash delay.
-- Verify Home Screen TopAppBar and centered message.
-- Verify back button behavior (exits app from Home).
+- Verify the directory structure in the Project view.
+- Ensure all packages contain a `.gitkeep` (or empty placeholder) if needed, though usually, we just create the directories.

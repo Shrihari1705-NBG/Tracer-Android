@@ -19,6 +19,16 @@ I have successfully implemented Navigation Compose in the SmartCampusNavigator p
 ### Integration
 - Modified `MainActivity.kt` to launch `AppNavigation()` as the root composable, removing the default boilerplate.
 
+## Package Structure
+
+I have established the Clean Architecture package structure:
+- **Data**: `ble/`, `database/`, `datasource/`, `model/`, `repository/`
+- **Domain**: `model/`, `repository/`, `usecase/`
+- **UI**: `components/`, `viewmodel/`
+- **Other**: `di/`, `utils/`
+
+All directories were created without adding any files or modifying existing ones.
+
 ## Verification Results
 
 ### Automated Tests

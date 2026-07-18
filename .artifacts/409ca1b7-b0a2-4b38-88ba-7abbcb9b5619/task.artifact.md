@@ -14,5 +14,9 @@
 - [x] Verification
     - [x] Run build to verify dependencies
     - [x] Verify UI flow (Manual)
+- [x] Create Package Structure
+    - [x] Create Data layer packages
+    - [x] Create Domain layer packages
+    - [x] Create DI, UI components, Viewmodel, and Utils packages
     - [ ] Run build to verify dependencies
     - [ ] Verify UI flow (Manual)
