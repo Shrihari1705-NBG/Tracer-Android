@@ -1,4 +1,7 @@
 <p align="center">
+  <img src="branding/logo/tracer-logo.png" alt="Tracer Logo" width="180">
+</p>
+<p align="center">
 
 <img src="https://img.shields.io/badge/Platform-Android-green"/>
 
