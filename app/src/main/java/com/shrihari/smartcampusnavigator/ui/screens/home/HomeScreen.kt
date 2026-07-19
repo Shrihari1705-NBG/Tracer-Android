@@ -46,7 +46,7 @@ fun HomeScreen(
             when (item) {
                 BottomNavItem.Home -> navController.navigate(Screen.Home.route)
                 BottomNavItem.Scan -> navController.navigate(Screen.Scan.route)
-                BottomNavItem.Navigate -> { /* later */ }
+                BottomNavItem.Navigate -> navController.navigate(Screen.Navigate.route)
                 BottomNavItem.Settings -> { /* later */ }
             }
         }
