@@ -60,9 +60,8 @@ private fun ScanScreenContent(
                         BottomNavItem.Navigate ->
                             navController.navigate(Screen.Navigate.route)
 
-                        BottomNavItem.Settings -> {
-                            // Later
-                        }
+                        BottomNavItem.Settings ->
+                            navController.navigate(Screen.Settings.route)
                     }
                 }
             )

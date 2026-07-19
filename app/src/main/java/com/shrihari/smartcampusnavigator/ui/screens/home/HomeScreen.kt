@@ -47,7 +47,7 @@ fun HomeScreen(
                 BottomNavItem.Home -> navController.navigate(Screen.Home.route)
                 BottomNavItem.Scan -> navController.navigate(Screen.Scan.route)
                 BottomNavItem.Navigate -> navController.navigate(Screen.Navigate.route)
-                BottomNavItem.Settings -> { /* later */ }
+                BottomNavItem.Settings -> navController.navigate(Screen.Settings.route)
             }
         }
     )
@@ -94,8 +94,17 @@ private fun HomeScreenContent(
 
             StatusCard(
                 title = "Bluetooth",
-                status = uiState.bluetoothStatus,
-                statusColor = MaterialTheme.colorScheme.error
+                status =
+                    if (uiState.bluetoothEnabled)
+                        "Enabled"
+                    else
+                        "Disabled",
+
+                statusColor =
+                    if (uiState.bluetoothEnabled)
+                        SuccessGreen
+                    else
+                        MaterialTheme.colorScheme.error
             )
 
             StatusCard(

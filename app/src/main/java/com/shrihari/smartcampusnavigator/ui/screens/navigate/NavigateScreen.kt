@@ -64,9 +64,8 @@ private fun NavigateScreenContent(
                         BottomNavItem.Navigate ->
                             navController.navigate(Screen.Navigate.route)
 
-                        BottomNavItem.Settings -> {
-                            // Coming Soon
-                        }
+                        BottomNavItem.Settings ->
+                            navController.navigate(Screen.Settings.route)
                     }
                 }
             )

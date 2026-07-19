@@ -10,9 +10,14 @@ import com.shrihari.smartcampusnavigator.ui.screens.splash.SplashScreen
 import com.shrihari.smartcampusnavigator.ui.viewmodel.HomeViewModel
 import com.shrihari.smartcampusnavigator.ui.screens.scan.ScanScreen
 import com.shrihari.smartcampusnavigator.ui.screens.navigate.NavigateScreen
+import com.shrihari.smartcampusnavigator.ui.screens.settings.SettingsScreen
+import com.shrihari.smartcampusnavigator.ui.theme.ThemeViewModel
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    themeViewModel: ThemeViewModel
+) {
+
     val navController = rememberNavController()
 
     NavHost(
@@ -40,5 +45,14 @@ fun AppNavigation() {
                 navController = navController
             )
         }
+        composable(Screen.Settings.route) {
+
+            SettingsScreen(
+                navController = navController,
+                themeViewModel = themeViewModel
+            )
+
+        }
     }
 }
+
