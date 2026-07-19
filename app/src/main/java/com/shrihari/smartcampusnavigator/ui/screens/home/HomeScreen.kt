@@ -26,11 +26,14 @@ import com.shrihari.smartcampusnavigator.ui.theme.TracerTheme
 import com.shrihari.smartcampusnavigator.ui.viewmodel.HomeViewModel
 import androidx.compose.ui.res.painterResource
 import com.shrihari.smartcampusnavigator.R
+import androidx.navigation.NavController
+import com.shrihari.smartcampusnavigator.ui.navigation.Screen
 
 private val SuccessGreen = Color(0xFF4CAF50)
 
 @Composable
 fun HomeScreen(
+    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -39,7 +42,14 @@ fun HomeScreen(
     HomeScreenContent(
         uiState = uiState,
         onStartScan = viewModel::onStartScan,
-        onBottomNavSelected = viewModel::onBottomNavSelected
+        onBottomNavSelected = { item ->
+            when (item) {
+                BottomNavItem.Home -> navController.navigate(Screen.Home.route)
+                BottomNavItem.Scan -> navController.navigate(Screen.Scan.route)
+                BottomNavItem.Navigate -> { /* later */ }
+                BottomNavItem.Settings -> { /* later */ }
+            }
+        }
     )
 }
 

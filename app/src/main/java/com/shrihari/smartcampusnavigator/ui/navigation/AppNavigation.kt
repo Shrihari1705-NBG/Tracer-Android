@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.shrihari.smartcampusnavigator.ui.screens.home.HomeScreen
 import com.shrihari.smartcampusnavigator.ui.screens.splash.SplashScreen
 import com.shrihari.smartcampusnavigator.ui.viewmodel.HomeViewModel
+import com.shrihari.smartcampusnavigator.ui.screens.scan.ScanScreen
 
 @Composable
 fun AppNavigation() {
@@ -22,7 +23,16 @@ fun AppNavigation() {
         }
         composable(route = Screen.Home.route) {
             val homeViewModel: HomeViewModel = hiltViewModel()
-            HomeScreen(viewModel = homeViewModel)
+
+            HomeScreen(
+                navController = navController,
+                viewModel = homeViewModel
+            )
+        }
+        composable(route = Screen.Scan.route) {
+            ScanScreen(
+                navController = navController
+            )
         }
     }
 }

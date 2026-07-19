@@ -96,7 +96,9 @@ fun BottomNavBar(
         items.forEach { item ->
             NavigationBarItem(
                 selected = selectedItem.route == item.route,
-                onClick = {},
+                onClick = {
+                    onItemSelected(item)
+                },
                 icon = {
                     Icon(
                         imageVector = item.icon,
