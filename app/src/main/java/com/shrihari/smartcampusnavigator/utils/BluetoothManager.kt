@@ -1,8 +1,9 @@
 package com.shrihari.smartcampusnavigator.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothManager as AndroidBluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -22,11 +23,12 @@ class BluetoothManager @Inject constructor(
 
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
         val manager =
-            context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-
+            context.getSystemService(Context.BLUETOOTH_SERVICE) as AndroidBluetoothManager
         manager.adapter
     }
 
+
+    @SuppressLint("MissingPermission")
     private val _bluetoothState =
         MutableStateFlow(bluetoothAdapter?.isEnabled == true)
 
@@ -35,6 +37,7 @@ class BluetoothManager @Inject constructor(
 
     private val bluetoothStateReceiver = object : BroadcastReceiver() {
 
+        @SuppressLint("MissingPermission")
         override fun onReceive(context: Context?, intent: Intent?) {
 
             if (intent?.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
@@ -43,46 +46,33 @@ class BluetoothManager @Inject constructor(
                     bluetoothAdapter?.isEnabled == true
 
             }
-
         }
-
     }
 
     init {
-
         context.registerReceiver(
             bluetoothStateReceiver,
             IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         )
-
     }
 
     fun isBluetoothSupported(): Boolean {
-
         return bluetoothAdapter != null
-
     }
 
+    @SuppressLint("MissingPermission")
     fun isBluetoothEnabled(): Boolean {
-
         return bluetoothAdapter?.isEnabled == true
-
     }
 
+    @SuppressLint("MissingPermission")
     fun requestEnableBluetooth(activity: Activity) {
-
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-
         activity.startActivity(intent)
-
     }
 
     fun openBluetoothSettings(activity: Activity) {
-
         val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-
         activity.startActivity(intent)
-
     }
-
 }

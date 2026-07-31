@@ -15,11 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.shrihari.smartcampusnavigator.ui.screens.scan.Beacon
+import com.shrihari.smartcampusnavigator.data.model.BleDevice
 
 @Composable
 fun BeaconListCard(
-    beacons: List<Beacon>,
+    devices: List<BleDevice>,
     modifier: Modifier = Modifier
 ) {
 
@@ -41,7 +41,7 @@ fun BeaconListCard(
                 fontWeight = FontWeight.Bold
             )
 
-            beacons.forEachIndexed { index, beacon ->
+            devices.forEachIndexed { index, device ->
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -50,18 +50,18 @@ fun BeaconListCard(
                 ) {
 
                     Text(
-                        text = beacon.name,
+                        text = device.name ?: "Unknown Device",
                         style = MaterialTheme.typography.bodyLarge
                     )
 
                     Text(
-                        text = beacon.rssi,
+                        text = "${device.rssi} dBm",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
 
-                if (index != beacons.lastIndex) {
+                if (index != devices.lastIndex) {
                     Divider()
                 }
             }

@@ -9,17 +9,37 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.shrihari.smartcampusnavigator.data.ble.BleScannerManager
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
-    private val bluetoothManager: BluetoothManager
+    private val bluetoothManager: BluetoothManager,
+    private val bleScannerManager: BleScannerManager
 ) : ViewModel() {
+
+    fun startScan() {
+        bleScannerManager.startScan()
+    }
+
+    fun stopScan() {
+        bleScannerManager.stopScan()
+    }
+
+    fun toggleScan() {
+
+        if (_uiState.value.isScanning) {
+            stopScan()
+        } else {
+            startScan()
+        }
+    }
 
     private val _uiState = MutableStateFlow(ScanUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
         observeBluetoothState()
+        observeScannerState()
     }
 
     private fun observeBluetoothState() {
@@ -40,6 +60,32 @@ class ScanViewModel @Inject constructor(
 
         }
 
+    }
+    private fun observeScannerState() {
+
+        viewModelScope.launch {
+
+            bleScannerManager.devices.collect { devices ->
+
+                _uiState.update {
+                    it.copy(
+                        nearbyDevices = devices
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
+
+            bleScannerManager.isScanning.collect { scanning ->
+
+                _uiState.update {
+                    it.copy(
+                        isScanning = scanning
+                    )
+                }
+            }
+        }
     }
 
 }

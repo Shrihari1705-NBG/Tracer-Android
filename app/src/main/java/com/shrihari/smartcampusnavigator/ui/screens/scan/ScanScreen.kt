@@ -33,7 +33,8 @@ fun ScanScreen(
 
     ScanScreenContent(
         navController = navController,
-        uiState = uiState.value
+        uiState = uiState.value,
+        viewModel = viewModel
     )
 }
 
@@ -41,7 +42,8 @@ fun ScanScreen(
 @Composable
 private fun ScanScreenContent(
     navController: NavController,
-    uiState: ScanUiState
+    uiState: ScanUiState,
+    viewModel: ScanViewModel
 ) {
 
     Scaffold(
@@ -93,13 +95,13 @@ private fun ScanScreenContent(
             )
 
             BeaconListCard(
-                beacons = uiState.nearbyBeacons
+                devices = uiState.nearbyDevices
             )
 
             PrimaryButton(
-                text = "Start Scan",
+                text = if (uiState.isScanning) "Stop Scan" else "Start Scan",
                 onClick = {
-                    // BLE Scan starts here later
+                    viewModel.toggleScan()
                 }
             )
         }
