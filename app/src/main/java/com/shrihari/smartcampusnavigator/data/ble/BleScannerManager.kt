@@ -10,9 +10,16 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import com.shrihari.smartcampusnavigator.data.model.BleDevice
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,8 +28,10 @@ class BleScannerManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    private companion object {
-        const val BEACON_PREFIX = "TRACER_"
+    companion object {
+        private const val BEACON_PREFIX = "TRACER_"
+        private const val EXPIRATION_TIMEOUT = 5_000L
+        private const val CLEANUP_INTERVAL = 1_000L
     }
 
     // -------------------------------------------------------------------------
@@ -38,7 +47,6 @@ class BleScannerManager @Inject constructor(
     private val bluetoothLeScanner: BluetoothLeScanner?
         get() = bluetoothAdapter?.bluetoothLeScanner
 
-
     // -------------------------------------------------------------------------
     // Scanner Configuration
     // -------------------------------------------------------------------------
@@ -47,13 +55,11 @@ class BleScannerManager @Inject constructor(
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
 
-
     // -------------------------------------------------------------------------
     // Device Storage
     // -------------------------------------------------------------------------
 
     private val deviceCache = DeviceCache()
-
 
     // -------------------------------------------------------------------------
     // State
@@ -67,6 +73,15 @@ class BleScannerManager @Inject constructor(
     val isScanning: StateFlow<Boolean> =
         _isScanning.asStateFlow()
 
+    // -------------------------------------------------------------------------
+    // Cleanup Job
+    // -------------------------------------------------------------------------
+
+    private val scannerScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Default
+    )
+
+    private var cleanupJob: Job? = null
 
     // -------------------------------------------------------------------------
     // Scanner Callback
@@ -101,7 +116,6 @@ class BleScannerManager @Inject constructor(
         }
     }
 
-
     // -------------------------------------------------------------------------
     // Helper Functions
     // -------------------------------------------------------------------------
@@ -112,6 +126,28 @@ class BleScannerManager @Inject constructor(
                 bluetoothLeScanner != null
     }
 
+    private fun startCleanupJob() {
+
+        cleanupJob?.cancel()
+
+        cleanupJob = scannerScope.launch {
+
+            while (isActive && _isScanning.value) {
+
+                delay(CLEANUP_INTERVAL)
+
+                deviceCache.removeExpiredDevices(EXPIRATION_TIMEOUT)
+
+                _devices.value = deviceCache.getDevices()
+            }
+        }
+    }
+
+    private fun stopCleanupJob() {
+
+        cleanupJob?.cancel()
+        cleanupJob = null
+    }
 
     // -------------------------------------------------------------------------
     // Public API
@@ -129,6 +165,8 @@ class BleScannerManager @Inject constructor(
         )
 
         _isScanning.value = true
+
+        startCleanupJob()
     }
 
     @SuppressLint("MissingPermission")
@@ -139,5 +177,11 @@ class BleScannerManager @Inject constructor(
         bluetoothLeScanner?.stopScan(scanCallback)
 
         _isScanning.value = false
+
+        stopCleanupJob()
+
+        // Clear cached devices when scanning stops
+        deviceCache.clear()
+        _devices.value = emptyList()
     }
 }

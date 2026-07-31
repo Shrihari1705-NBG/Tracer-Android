@@ -118,11 +118,6 @@ private fun HomeScreenContent(
                 status = uiState.currentLocation,
                 statusColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            PrimaryButton(
-                text = "Start Scan",
-                onClick = onStartScan
-            )
         }
     }
 }
