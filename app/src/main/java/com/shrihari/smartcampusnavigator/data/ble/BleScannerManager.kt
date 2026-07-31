@@ -21,6 +21,10 @@ class BleScannerManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
+    private companion object {
+        const val BEACON_PREFIX = "TRACER_"
+    }
+
     // -------------------------------------------------------------------------
     // Bluetooth Objects
     // -------------------------------------------------------------------------
@@ -76,8 +80,16 @@ class BleScannerManager @Inject constructor(
             result: ScanResult
         ) {
 
+            val deviceName = result.device.name
+                ?.removePrefix("=")
+
+            // Ignore devices that are not Tracer beacons
+            if (deviceName.isNullOrBlank() || !deviceName.startsWith(BEACON_PREFIX)) {
+                return
+            }
+
             val bleDevice = BleDevice(
-                name = result.device.name,
+                name = deviceName,
                 address = result.device.address,
                 rssi = result.rssi,
                 lastSeen = System.currentTimeMillis()
