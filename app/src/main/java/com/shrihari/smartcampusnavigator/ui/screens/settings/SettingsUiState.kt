@@ -6,8 +6,6 @@ data class SettingsUiState(
 
     val bluetoothEnabled: Boolean = false,
 
-    val locationEnabled: Boolean = false,
-
     val version: String = "1.0.0"
 
 )

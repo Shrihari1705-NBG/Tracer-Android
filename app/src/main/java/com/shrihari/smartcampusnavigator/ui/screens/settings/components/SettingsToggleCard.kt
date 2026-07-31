@@ -1,11 +1,11 @@
 package com.shrihari.smartcampusnavigator.ui.screens.settings.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -16,18 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.shrihari.smartcampusnavigator.ui.screens.settings.components.ApplicationCard
-import com.shrihari.smartcampusnavigator.ui.screens.settings.components.DevelopersCard
-import com.shrihari.smartcampusnavigator.ui.screens.settings.components.GuideCard
 
 @Composable
 fun SettingsToggleCard(
     darkThemeEnabled: Boolean,
     bluetoothEnabled: Boolean,
-    locationEnabled: Boolean,
     onDarkThemeChanged: (Boolean) -> Unit,
     onBluetoothChanged: (Boolean) -> Unit,
-    onLocationChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -53,12 +48,6 @@ fun SettingsToggleCard(
                 title = "Bluetooth",
                 checked = bluetoothEnabled,
                 onCheckedChange = onBluetoothChanged
-            )
-
-            ToggleRow(
-                title = "Location",
-                checked = locationEnabled,
-                onCheckedChange = onLocationChanged
             )
 
         }

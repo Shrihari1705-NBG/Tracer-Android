@@ -6,79 +6,91 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.shrihari.smartcampusnavigator.R
 import com.shrihari.smartcampusnavigator.ui.components.BottomNavBar
 import com.shrihari.smartcampusnavigator.ui.components.BottomNavItem
-import com.shrihari.smartcampusnavigator.ui.components.PrimaryButton
-import com.shrihari.smartcampusnavigator.ui.components.StatusCard
 import com.shrihari.smartcampusnavigator.ui.components.TracerTopBar
 import com.shrihari.smartcampusnavigator.ui.components.WelcomeBanner
+import com.shrihari.smartcampusnavigator.ui.navigation.Screen
+import com.shrihari.smartcampusnavigator.ui.screens.home.components.CurrentLocationCard
+import com.shrihari.smartcampusnavigator.ui.screens.home.components.RecentDestinationCard
+import com.shrihari.smartcampusnavigator.ui.screens.home.components.SystemStatusCard
 import com.shrihari.smartcampusnavigator.ui.theme.TracerTheme
 import com.shrihari.smartcampusnavigator.ui.viewmodel.HomeViewModel
-import androidx.compose.ui.res.painterResource
-import com.shrihari.smartcampusnavigator.R
-import androidx.navigation.NavController
-import com.shrihari.smartcampusnavigator.ui.navigation.Screen
-
-private val SuccessGreen = Color(0xFF4CAF50)
 
 @Composable
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreenContent(
         uiState = uiState,
-        onStartScan = viewModel::onStartScan,
         onBottomNavSelected = { item ->
+
             when (item) {
-                BottomNavItem.Home -> navController.navigate(Screen.Home.route)
-                BottomNavItem.Scan -> navController.navigate(Screen.Scan.route)
-                BottomNavItem.Navigate -> navController.navigate(Screen.Navigate.route)
-                BottomNavItem.Settings -> navController.navigate(Screen.Settings.route)
+
+                BottomNavItem.Home ->
+                    navController.navigate(Screen.Home.route)
+
+                BottomNavItem.Scan ->
+                    navController.navigate(Screen.Scan.route)
+
+                BottomNavItem.Navigate ->
+                    navController.navigate(Screen.Navigate.route)
+
+                BottomNavItem.Settings ->
+                    navController.navigate(Screen.Settings.route)
+
             }
+
         }
+
     )
+
 }
 
 @Composable
 private fun HomeScreenContent(
     uiState: HomeUiState,
-    onStartScan: () -> Unit,
     onBottomNavSelected: (BottomNavItem) -> Unit
 ) {
+
     Scaffold(
+
         bottomBar = {
-            android.util.Log.d(
-                "Tracer",
-                "HomeScreen selectedBottomNav = ${uiState.selectedBottomNav}"
-            )
+
             BottomNavBar(
                 selectedItem = uiState.selectedBottomNav,
                 onItemSelected = onBottomNavSelected
             )
+
         }
+
     ) { innerPadding ->
 
         Column(
+
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
+
             verticalArrangement = Arrangement.spacedBy(16.dp)
+
         ) {
 
             TracerTopBar(
@@ -92,44 +104,36 @@ private fun HomeScreenContent(
                 message = "Ready to navigate your campus?"
             )
 
-            StatusCard(
-                title = "Bluetooth",
-                status =
-                    if (uiState.bluetoothEnabled)
-                        "Enabled"
-                    else
-                        "Disabled",
-
-                statusColor =
-                    if (uiState.bluetoothEnabled)
-                        SuccessGreen
-                    else
-                        MaterialTheme.colorScheme.error
+            CurrentLocationCard(
+                location = uiState.currentLocation
             )
 
-            StatusCard(
-                title = "BLE Scanner",
-                status = uiState.scannerStatus,
-                statusColor = SuccessGreen
+            RecentDestinationCard(
+                destination = "No recent destination"
             )
 
-            StatusCard(
-                title = "Current Location",
-                status = uiState.currentLocation,
-                statusColor = MaterialTheme.colorScheme.onSurfaceVariant
+            SystemStatusCard(
+                bluetoothEnabled = uiState.bluetoothEnabled,
+                scannerStatus = uiState.scannerStatus
             )
+
         }
+
     }
+
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun HomeScreenContentPreview() {
+private fun HomePreview() {
+
     TracerTheme {
+
         HomeScreenContent(
             uiState = HomeUiState(),
-            onStartScan = {},
             onBottomNavSelected = {}
         )
+
     }
+
 }

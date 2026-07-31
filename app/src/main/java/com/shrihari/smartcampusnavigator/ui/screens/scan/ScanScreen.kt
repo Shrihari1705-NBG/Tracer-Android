@@ -90,8 +90,7 @@ private fun ScanScreenContent(
             )
 
             ScanStatusCard(
-                bluetoothEnabled = uiState.bluetoothEnabled,
-                permissionGranted = uiState.permissionGranted
+                bluetoothEnabled = uiState.bluetoothEnabled
             )
 
             BeaconListCard(

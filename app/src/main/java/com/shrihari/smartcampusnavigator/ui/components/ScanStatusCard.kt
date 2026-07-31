@@ -19,7 +19,6 @@ private val SuccessGreen = Color(0xFF4CAF50)
 @Composable
 fun ScanStatusCard(
     bluetoothEnabled: Boolean,
-    permissionGranted: Boolean,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -44,15 +43,6 @@ fun ScanStatusCard(
                 label = "Bluetooth",
                 value = if (bluetoothEnabled) "Enabled" else "Disabled",
                 color = if (bluetoothEnabled)
-                    SuccessGreen
-                else
-                    MaterialTheme.colorScheme.error
-            )
-
-            StatusItem(
-                label = "Permission",
-                value = if (permissionGranted) "Granted" else "Denied",
-                color = if (permissionGranted)
                     SuccessGreen
                 else
                     MaterialTheme.colorScheme.error

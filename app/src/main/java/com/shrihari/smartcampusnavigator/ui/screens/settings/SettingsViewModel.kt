@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shrihari.smartcampusnavigator.data.repository.SettingsRepository
 import com.shrihari.smartcampusnavigator.utils.BluetoothManager
-import com.shrihari.smartcampusnavigator.utils.LocationManager
 import com.shrihari.smartcampusnavigator.utils.PermissionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,22 +19,19 @@ class SettingsViewModel @Inject constructor(
 
     private val settingsRepository: SettingsRepository,
     private val permissionManager: PermissionManager,
-    private val bluetoothManager: BluetoothManager,
-    private val locationManager: LocationManager
+    private val bluetoothManager: BluetoothManager
 
 ) : ViewModel() {
 
     val uiState: StateFlow<SettingsUiState> =
         combine(
             settingsRepository.darkThemeEnabled,
-            bluetoothManager.bluetoothState,
-            locationManager.locationState
-        ) { darkTheme, bluetooth, location ->
+            bluetoothManager.bluetoothState
+        ) { darkTheme, bluetooth ->
 
             SettingsUiState(
                 darkThemeEnabled = darkTheme,
-                bluetoothEnabled = bluetooth,
-                locationEnabled = location
+                bluetoothEnabled = bluetooth
             )
 
         }.stateIn(
@@ -48,16 +44,8 @@ class SettingsViewModel @Inject constructor(
         return permissionManager.hasBluetoothPermissions()
     }
 
-    fun hasLocationPermission(): Boolean {
-        return permissionManager.hasLocationPermission()
-    }
-
     fun isBluetoothEnabled(): Boolean {
         return bluetoothManager.isBluetoothEnabled()
-    }
-
-    fun isLocationEnabled(): Boolean {
-        return locationManager.isLocationEnabled()
     }
 
     fun requestEnableBluetooth(activity: Activity) {
@@ -66,10 +54,6 @@ class SettingsViewModel @Inject constructor(
 
     fun openBluetoothSettings(activity: Activity) {
         bluetoothManager.openBluetoothSettings(activity)
-    }
-
-    fun openLocationSettings(activity: Activity) {
-        locationManager.openLocationSettings(activity)
     }
 
     fun onDarkThemeChanged(enabled: Boolean) {

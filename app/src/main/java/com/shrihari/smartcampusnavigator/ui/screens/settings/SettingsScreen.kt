@@ -57,16 +57,6 @@ fun SettingsScreen(
 
         }
 
-    val locationPermissionLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission()
-        ) { granted ->
-
-            if (granted) {
-                viewModel.openLocationSettings(activity)
-            }
-
-        }
 
     SettingsScreenContent(
         navController = navController,
@@ -117,32 +107,6 @@ fun SettingsScreen(
 
         },
 
-        onLocationChanged = { enabled ->
-
-            if (enabled) {
-
-                if (viewModel.hasLocationPermission()) {
-
-                    viewModel.openLocationSettings(activity)
-
-                } else {
-
-                    locationPermissionLauncher.launch(
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    )
-
-                }
-
-            } else {
-
-                // Android does not allow apps to disable
-                // Location Services directly.
-
-                viewModel.openLocationSettings(activity)
-
-            }
-
-        }
 
     )
 
@@ -154,8 +118,7 @@ private fun SettingsScreenContent(
     themeViewModel: ThemeViewModel,
     uiState: SettingsUiState,
     onDarkThemeChanged: (Boolean) -> Unit,
-    onBluetoothChanged: (Boolean) -> Unit,
-    onLocationChanged: (Boolean) -> Unit
+    onBluetoothChanged: (Boolean) -> Unit
 ) {
 
     Scaffold(
@@ -213,7 +176,6 @@ private fun SettingsScreenContent(
             SettingsToggleCard(
                 darkThemeEnabled = uiState.darkThemeEnabled,
                 bluetoothEnabled = uiState.bluetoothEnabled,
-                locationEnabled = uiState.locationEnabled,
 
                 onDarkThemeChanged = {
 
@@ -222,10 +184,7 @@ private fun SettingsScreenContent(
 
                 },
 
-                onBluetoothChanged = onBluetoothChanged,
-
-                onLocationChanged = onLocationChanged
-
+                onBluetoothChanged = onBluetoothChanged
             )
 
             ApplicationCard(

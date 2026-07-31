@@ -12,12 +12,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+import com.shrihari.smartcampusnavigator.data.ble.BleScannerManager
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: HomeRepository,
-    private val bluetoothManager: BluetoothManager
-) : ViewModel() {
+    private val bluetoothManager: BluetoothManager,
+    private val bleScannerManager: BleScannerManager
+) : ViewModel(){
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
@@ -25,6 +26,7 @@ class HomeViewModel @Inject constructor(
     init {
         loadWelcomeMessage()
         observeBluetoothState()
+        observeBeaconStatus()
     }
 
     private fun loadWelcomeMessage() {
@@ -58,6 +60,41 @@ class HomeViewModel @Inject constructor(
         }
 
     }
+
+private fun observeBeaconStatus() {
+
+    viewModelScope.launch {
+
+        bleScannerManager.devices.collect { devices ->
+
+            val status = when {
+
+                !_uiState.value.bluetoothEnabled ->
+                    "Bluetooth Off"
+
+                devices.isEmpty() ->
+                    "Scanning..."
+
+                devices.size == 1 ->
+                    "1 Beacon Detected"
+
+                else ->
+                    "${devices.size} Beacons Detected"
+            }
+
+            _uiState.update {
+
+                it.copy(
+                    scannerStatus = status
+                )
+
+            }
+
+        }
+
+    }
+
+}
 
     fun onStartScan() {
         // TODO: Implement BLE scan
