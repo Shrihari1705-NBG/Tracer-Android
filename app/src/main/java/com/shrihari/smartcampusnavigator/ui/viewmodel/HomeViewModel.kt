@@ -1,7 +1,10 @@
 package com.shrihari.smartcampusnavigator.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shrihari.smartcampusnavigator.data.ble.BleScannerManager
+import com.shrihari.smartcampusnavigator.data.ml.OnnxLocalizationManager
 import com.shrihari.smartcampusnavigator.domain.repository.HomeRepository
 import com.shrihari.smartcampusnavigator.ui.components.BottomNavItem
 import com.shrihari.smartcampusnavigator.ui.screens.home.HomeUiState
@@ -12,34 +15,58 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.shrihari.smartcampusnavigator.data.ble.BleScannerManager
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+
     private val repository: HomeRepository,
+
     private val bluetoothManager: BluetoothManager,
-    private val bleScannerManager: BleScannerManager
-) : ViewModel(){
+
+    private val bleScannerManager: BleScannerManager,
+
+    private val onnxLocalizationManager: OnnxLocalizationManager
+
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
+
         loadWelcomeMessage()
+
         observeBluetoothState()
+
         observeBeaconStatus()
+
     }
 
+    // ---------------------------------------------------------
+    // Welcome Message
+    // ---------------------------------------------------------
+
     private fun loadWelcomeMessage() {
+
         viewModelScope.launch {
+
             val message = repository.getWelcomeMessage()
 
             _uiState.update {
+
                 it.copy(
                     welcomeMessage = message
                 )
+
             }
+
         }
+
     }
+
+    // ---------------------------------------------------------
+    // Bluetooth State
+    // ---------------------------------------------------------
 
     private fun observeBluetoothState() {
 
@@ -61,32 +88,118 @@ class HomeViewModel @Inject constructor(
 
     }
 
-private fun observeBeaconStatus() {
+    // ---------------------------------------------------------
+    // BLE + ML Localization
+    // ---------------------------------------------------------
 
-    viewModelScope.launch {
+    private fun observeBeaconStatus() {
 
-        bleScannerManager.devices.collect { devices ->
+        viewModelScope.launch {
 
-            val status = when {
+            bleScannerManager.devices.collect { devices ->
 
-                !_uiState.value.bluetoothEnabled ->
-                    "Bluetooth Off"
+                val status = when {
 
-                devices.isEmpty() ->
-                    "Scanning..."
+                    !_uiState.value.bluetoothEnabled ->
+                        "Bluetooth Off"
 
-                devices.size == 1 ->
-                    "1 Beacon Detected"
+                    devices.isEmpty() ->
+                        "Waiting for Tracer Beacons..."
 
-                else ->
-                    "${devices.size} Beacons Detected"
-            }
+                    devices.size == 1 ->
+                        "1 Beacon Detected"
 
-            _uiState.update {
+                    else ->
+                        "${devices.size} Beacons Detected"
 
-                it.copy(
-                    scannerStatus = status
+                }
+
+                // ---------------------------------------------
+                // Build RSSI Vector
+                // Missing beacons = -100
+                // ---------------------------------------------
+
+                val rssiVector = FloatArray(7) { -100f }
+
+                devices.forEach { device ->
+
+                    when (device.name) {
+
+                        "TRACER_B1" -> rssiVector[0] = device.rssi.toFloat()
+
+                        "TRACER_B2" -> rssiVector[1] = device.rssi.toFloat()
+
+                        "TRACER_B3" -> rssiVector[2] = device.rssi.toFloat()
+
+                        "TRACER_B4" -> rssiVector[3] = device.rssi.toFloat()
+
+                        "TRACER_B5" -> rssiVector[4] = device.rssi.toFloat()
+
+                        "TRACER_B6" -> rssiVector[5] = device.rssi.toFloat()
+
+                        "TRACER_B7" -> rssiVector[6] = device.rssi.toFloat()
+
+                    }
+
+                }
+
+                Log.d(
+                    "TRACER_ML",
+                    "RSSI = ${rssiVector.joinToString()}"
                 )
+
+                // ---------------------------------------------------------
+                // Wait until at least one Tracer beacon is detected
+                // ---------------------------------------------------------
+
+                if (devices.isEmpty()) {
+
+                    _uiState.update {
+
+                        it.copy(
+
+                            scannerStatus = status,
+
+                            predictedNode = "Waiting for Beacons..."
+
+                        )
+
+                    }
+
+                    return@collect
+
+                }
+
+                // ---------------------------------------------
+                // Predict Current Node
+                // ---------------------------------------------
+
+                val predictedIndex =
+                    onnxLocalizationManager.predictNode(rssiVector)
+
+                val predictedNode =
+                    "N${predictedIndex + 13}"
+
+                Log.d(
+                    "TRACER_ML",
+                    "Prediction = $predictedNode"
+                )
+
+                // ---------------------------------------------
+                // Update UI
+                // ---------------------------------------------
+
+                _uiState.update {
+
+                    it.copy(
+
+                        scannerStatus = status,
+
+                        predictedNode = predictedNode
+
+                    )
+
+                }
 
             }
 
@@ -94,17 +207,59 @@ private fun observeBeaconStatus() {
 
     }
 
-}
+    fun onActualNodeSelected(node: String) {
 
-    fun onStartScan() {
-        // TODO: Implement BLE scan
+        _uiState.update {
+
+            it.copy(
+                selectedActualNode = node
+            )
+
+        }
+
     }
 
+    // ---------------------------------------------------------
+    // Start Scan
+    // ---------------------------------------------------------
+
+    fun onStartScan() {
+
+        Log.d(
+            "HOME_SCAN",
+            "Start Scan Button Pressed"
+        )
+
+        if (!_uiState.value.bluetoothEnabled) {
+
+            Log.d(
+                "HOME_SCAN",
+                "Bluetooth OFF"
+            )
+
+            return
+
+        }
+
+        bleScannerManager.startScan()
+
+    }
+
+
+    // ---------------------------------------------------------
+    // Bottom Navigation
+    // ---------------------------------------------------------
+
     fun onBottomNavSelected(item: BottomNavItem) {
+
         _uiState.update {
+
             it.copy(
                 selectedBottomNav = item
             )
+
         }
+
     }
+
 }

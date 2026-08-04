@@ -23,6 +23,7 @@ import com.shrihari.smartcampusnavigator.ui.components.TracerTopBar
 import com.shrihari.smartcampusnavigator.ui.components.WelcomeBanner
 import com.shrihari.smartcampusnavigator.ui.navigation.Screen
 import com.shrihari.smartcampusnavigator.ui.screens.home.components.CurrentLocationCard
+import com.shrihari.smartcampusnavigator.ui.screens.home.components.LocalizationCard
 import com.shrihari.smartcampusnavigator.ui.screens.home.components.RecentDestinationCard
 import com.shrihari.smartcampusnavigator.ui.screens.home.components.SystemStatusCard
 import com.shrihari.smartcampusnavigator.ui.theme.TracerTheme
@@ -37,7 +38,9 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreenContent(
+
         uiState = uiState,
+
         onBottomNavSelected = { item ->
 
             when (item) {
@@ -56,6 +59,18 @@ fun HomeScreen(
 
             }
 
+        },
+
+        onStartScan = {
+
+            viewModel.onStartScan()
+
+        },
+
+        onActualNodeSelected = {
+
+            viewModel.onActualNodeSelected(it)
+
         }
 
     )
@@ -64,8 +79,15 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenContent(
+
     uiState: HomeUiState,
-    onBottomNavSelected: (BottomNavItem) -> Unit
+
+    onBottomNavSelected: (BottomNavItem) -> Unit,
+
+    onStartScan: () -> Unit,
+
+    onActualNodeSelected: (String) -> Unit
+
 ) {
 
     Scaffold(
@@ -73,8 +95,11 @@ private fun HomeScreenContent(
         bottomBar = {
 
             BottomNavBar(
+
                 selectedItem = uiState.selectedBottomNav,
+
                 onItemSelected = onBottomNavSelected
+
             )
 
         }
@@ -94,27 +119,53 @@ private fun HomeScreenContent(
         ) {
 
             TracerTopBar(
+
                 title = "Tracer",
+
                 subtitle = "Indoor Navigation for Smart Campuses",
+
                 logo = painterResource(id = R.drawable.tracer_logo)
+
             )
 
             WelcomeBanner(
+
                 title = "Welcome",
+
                 message = "Ready to navigate your campus?"
+
             )
 
             CurrentLocationCard(
+
                 location = uiState.currentLocation
+
             )
 
             RecentDestinationCard(
+
                 destination = "No recent destination"
+
             )
 
             SystemStatusCard(
+
                 bluetoothEnabled = uiState.bluetoothEnabled,
+
                 scannerStatus = uiState.scannerStatus
+
+            )
+
+            LocalizationCard(
+
+                predictedNode = uiState.predictedNode,
+
+                selectedActualNode = uiState.selectedActualNode,
+
+                onActualNodeSelected = onActualNodeSelected,
+
+                onStartScan = onStartScan
+
             )
 
         }
@@ -130,8 +181,15 @@ private fun HomePreview() {
     TracerTheme {
 
         HomeScreenContent(
+
             uiState = HomeUiState(),
-            onBottomNavSelected = {}
+
+            onBottomNavSelected = {},
+
+            onStartScan = {},
+
+            onActualNodeSelected = {}
+
         )
 
     }

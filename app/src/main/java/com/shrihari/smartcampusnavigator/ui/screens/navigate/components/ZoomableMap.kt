@@ -24,9 +24,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.shrihari.smartcampusnavigator.R
+import com.shrihari.smartcampusnavigator.data.navigation.graph.GraphNode
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 
 @Composable
 fun ZoomableMap(
+    route: List<GraphNode>,
     modifier: Modifier = Modifier
 ) {
 
@@ -91,24 +97,50 @@ fun ZoomableMap(
         contentAlignment = Alignment.Center
 
     ){
+        Box {
 
-        Image(
-            painter = painterResource(R.drawable.department_map),
-            contentDescription = "Department Map",
+            Image(
+                painter = painterResource(R.drawable.department_map),
+                contentDescription = "Department Map",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        scaleX = animatedScale
+                        scaleY = animatedScale
+                        translationX = offset.x
+                        translationY = offset.y
+                    },
+                contentScale = ContentScale.Fit
+            )
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .graphicsLayer {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        scaleX = animatedScale
+                        scaleY = animatedScale
+                        translationX = offset.x
+                        translationY = offset.y
+                    }
+            ) {
 
-                    scaleX = animatedScale
-                    scaleY = animatedScale
+                if (route.size >= 2) {
 
-                    translationX = offset.x
-                    translationY = offset.y
+                    for (i in 0 until route.lastIndex) {
 
-                },
+                        val start = route[i].position
+                        val end = route[i + 1].position
 
-            contentScale = ContentScale.Fit
-        )
+                        drawLine(
+                            color = Color(0xFFFF9800),
+                            start = start,
+                            end = end,
+                            strokeWidth = 8f,
+                            cap = StrokeCap.Round
+                        )
+                    }
+                }
+            }
+        }
     }
 }

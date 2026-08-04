@@ -45,14 +45,21 @@ fun NavigateScreen(
 
     NavigateScreenContent(
         navController = navController,
-        uiState = uiState.value
+        uiState = uiState.value,
+        viewModel = viewModel
     )
 }
 
+
 @Composable
 private fun NavigateScreenContent(
+
     navController: NavController,
-    uiState: NavigateUiState
+
+    uiState: NavigateUiState,
+
+    viewModel: NavigateViewModel
+
 ) {
     var searchQuery by rememberSaveable {
         mutableStateOf("")
@@ -103,9 +110,6 @@ private fun NavigateScreenContent(
         mutableStateOf<DestinationCategory?>(null)
     }
 
-    var selectedDestination by remember {
-        mutableStateOf<Destination?>(null)
-    }
 
     Scaffold(
 
@@ -180,9 +184,10 @@ private fun NavigateScreenContent(
 
                     DestinationListCard(
                         destinations = facultyDestinations,
-                        selectedDestination = selectedDestination,
+                        selectedDestination = uiState.selectedDestination,
+
                         onDestinationSelected = {
-                            selectedDestination = it
+                            viewModel.selectDestination(it)
                         }
                     )
                 }
@@ -207,109 +212,116 @@ private fun NavigateScreenContent(
 
                     DestinationListCard(
                         destinations = laboratoryDestinations,
-                        selectedDestination = selectedDestination,
+                        selectedDestination = uiState.selectedDestination,
+
                         onDestinationSelected = {
-                            selectedDestination = it
+                            viewModel.selectDestination(it)
                         }
                     )
                 }
-            }
 
-            if (classroomDestinations.isNotEmpty()) {
+                if (classroomDestinations.isNotEmpty()) {
 
-                DestinationCategoryCard(
-                    title = "Classrooms",
-                    icon = "📚",
-                    expanded = expandedCategory == DestinationCategory.CLASSROOM,
-                    onClick = {
-                        expandedCategory =
-                            if (expandedCategory == DestinationCategory.CLASSROOM)
-                                null
-                            else
-                                DestinationCategory.CLASSROOM
+                    DestinationCategoryCard(
+                        title = "Classrooms",
+                        icon = "📚",
+                        expanded = expandedCategory == DestinationCategory.CLASSROOM,
+                        onClick = {
+                            expandedCategory =
+                                if (expandedCategory == DestinationCategory.CLASSROOM)
+                                    null
+                                else
+                                    DestinationCategory.CLASSROOM
+                        }
+                    )
+
+                    if (expandedCategory == DestinationCategory.CLASSROOM) {
+
+                        DestinationListCard(
+                            destinations = classroomDestinations,
+                            selectedDestination = uiState.selectedDestination,
+
+                            onDestinationSelected = {
+                                viewModel.selectDestination(it)
+                            }
+                        )
                     }
+                }
+
+                if (officeDestinations.isNotEmpty()) {
+
+                    DestinationCategoryCard(
+                        title = "Offices",
+                        icon = "🏢",
+                        expanded = expandedCategory == DestinationCategory.OFFICE,
+                        onClick = {
+                            expandedCategory =
+                                if (expandedCategory == DestinationCategory.OFFICE)
+                                    null
+                                else
+                                    DestinationCategory.OFFICE
+                        }
+                    )
+
+                    if (expandedCategory == DestinationCategory.OFFICE) {
+
+                        DestinationListCard(
+                            destinations = officeDestinations,
+                            selectedDestination = uiState.selectedDestination,
+
+                            onDestinationSelected = {
+                                viewModel.selectDestination(it)
+                            }
+                        )
+                    }
+                }
+
+                if (facilityDestinations.isNotEmpty()) {
+
+                    DestinationCategoryCard(
+                        title = "Facilities",
+                        icon = "📍",
+                        expanded = expandedCategory == DestinationCategory.FACILITY,
+                        onClick = {
+                            expandedCategory =
+                                if (expandedCategory == DestinationCategory.FACILITY)
+                                    null
+                                else
+                                    DestinationCategory.FACILITY
+                        }
+                    )
+
+                    if (expandedCategory == DestinationCategory.FACILITY) {
+
+                        DestinationListCard(
+                            destinations = facilityDestinations,
+                            selectedDestination = uiState.selectedDestination,
+
+                            onDestinationSelected = {
+                                viewModel.selectDestination(it)
+                            }
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Department Map",
+                    style = MaterialTheme.typography.titleMedium
                 )
 
-                if (expandedCategory == DestinationCategory.CLASSROOM) {
-
-                    DestinationListCard(
-                        destinations = classroomDestinations,
-                        selectedDestination = selectedDestination,
-                        onDestinationSelected = {
-                            selectedDestination = it
-                        }
-                    )
-                }
-            }
-
-            if (officeDestinations.isNotEmpty()) {
-
-                DestinationCategoryCard(
-                    title = "Offices",
-                    icon = "🏢",
-                    expanded = expandedCategory == DestinationCategory.OFFICE,
-                    onClick = {
-                        expandedCategory =
-                            if (expandedCategory == DestinationCategory.OFFICE)
-                                null
-                            else
-                                DestinationCategory.OFFICE
-                    }
+                ZoomableMap(
+                    route = uiState.route
                 )
 
-                if (expandedCategory == DestinationCategory.OFFICE) {
 
-                    DestinationListCard(
-                        destinations = officeDestinations,
-                        selectedDestination = selectedDestination,
-                        onDestinationSelected = {
-                            selectedDestination = it
-                        }
-                    )
-                }
-            }
-
-            if (facilityDestinations.isNotEmpty()) {
-
-                DestinationCategoryCard(
-                    title = "Facilities",
-                    icon = "📍",
-                    expanded = expandedCategory == DestinationCategory.FACILITY,
+                PrimaryButton(
+                    text = "Start Navigation",
+                    enabled = uiState.selectedDestination != null,
                     onClick = {
-                        expandedCategory =
-                            if (expandedCategory == DestinationCategory.FACILITY)
-                                null
-                            else
-                                DestinationCategory.FACILITY
+                        viewModel.startNavigation()
                     }
                 )
-
-                if (expandedCategory == DestinationCategory.FACILITY) {
-
-                    DestinationListCard(
-                        destinations = facilityDestinations,
-                        selectedDestination = selectedDestination,
-                        onDestinationSelected = {
-                            selectedDestination = it
-                        }
-                    )
-                }
             }
-
-            Text(
-                text = "Department Map",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            ZoomableMap()
-
-
-            PrimaryButton(
-                text = "Start Navigation",
-                onClick = {
-                    // A* Navigation will be implemented later
-                }
-            )
         }
     }
 }

@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.20.0")
 
     // Hilt
     implementation(libs.hilt.android)

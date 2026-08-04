@@ -22,6 +22,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import android.util.Log
 
 @Singleton
 class BleScannerManager @Inject constructor(
@@ -30,7 +31,7 @@ class BleScannerManager @Inject constructor(
 
     companion object {
         private const val BEACON_PREFIX = "TRACER_"
-        private const val EXPIRATION_TIMEOUT = 5_000L
+        private const val EXPIRATION_TIMEOUT = 15_000L
         private const val CLEANUP_INTERVAL = 1_000L
     }
 
@@ -95,8 +96,19 @@ class BleScannerManager @Inject constructor(
             result: ScanResult
         ) {
 
-            val deviceName = result.device.name
+            val deviceName = result.scanRecord
+                ?.deviceName
                 ?.removePrefix("=")
+
+            Log.d(
+                "BLE_CALLBACK",
+                "ScanResult received: ${result.scanRecord?.deviceName} RSSI=${result.rssi}"
+            )
+
+            android.util.Log.d(
+                "TRACER_SCAN",
+                "Name=$deviceName  MAC=${result.device.address} RSSI=${result.rssi}"
+            )
 
             // Ignore devices that are not Tracer beacons
             if (deviceName.isNullOrBlank() || !deviceName.startsWith(BEACON_PREFIX)) {
@@ -113,6 +125,11 @@ class BleScannerManager @Inject constructor(
             deviceCache.update(bleDevice)
 
             _devices.value = deviceCache.getDevices()
+
+            Log.d(
+                "BLE_CALLBACK",
+                "Devices Flow Updated = ${_devices.value.size}"
+            )
         }
     }
 
@@ -156,13 +173,30 @@ class BleScannerManager @Inject constructor(
     @SuppressLint("MissingPermission")
     fun startScan() {
 
-        if (!isScannerReady() || _isScanning.value) return
+        android.util.Log.d(
+            "BLE_MANAGER",
+            "startScan() called, isScanning=${_isScanning.value}"
+        )
+
+        if (!isScannerReady()) {
+
+            android.util.Log.d("BLE_MANAGER", "Scanner NOT ready")
+            return
+        }
+
+        if (_isScanning.value) {
+
+            android.util.Log.d("BLE_MANAGER", "Already scanning")
+            return
+        }
 
         bluetoothLeScanner?.startScan(
             null,
             scanSettings,
             scanCallback
         )
+
+        android.util.Log.d("BLE_MANAGER", "BLE Scan Started")
 
         _isScanning.value = true
 

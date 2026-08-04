@@ -1,12 +1,20 @@
 package com.shrihari.smartcampusnavigator.ui.screens.navigate
 
+import com.shrihari.smartcampusnavigator.data.navigation.graph.GraphNode
+import com.shrihari.smartcampusnavigator.ui.screens.navigate.model.Destination
+
 data class NavigateUiState(
 
-    val currentLocation: String = "HOD (ECE) Cabin",
+    // Current node predicted by ML
+    val currentNode: String = "N13",
 
-    val destination: String = "Block 6 (Smart Classroom)",
+    // Destination selected from UI
+    val selectedDestination: Destination? = null,
 
-    val mapImageRes: Int? = null,
+    // Generated A* path
+    val route: List<GraphNode> = emptyList(),
 
+    // Navigation state
     val isNavigationActive: Boolean = false
+
 )
