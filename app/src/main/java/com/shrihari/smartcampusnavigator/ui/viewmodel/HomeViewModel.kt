@@ -174,11 +174,8 @@ class HomeViewModel @Inject constructor(
                 // Predict Current Node
                 // ---------------------------------------------
 
-                val predictedIndex =
-                    onnxLocalizationManager.predictNode(rssiVector)
-
                 val predictedNode =
-                    "N${predictedIndex + 13}"
+                    onnxLocalizationManager.predictNode(rssiVector)
 
                 Log.d(
                     "TRACER_ML",
