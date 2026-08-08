@@ -78,6 +78,11 @@ private fun NavigateScreenContent(
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
+    LaunchedEffect(uiState.isNavigationActive) {
+        if (uiState.isNavigationActive) {
+            scrollState.animateScrollTo(700)
+        }
+    }
     val scope = rememberCoroutineScope()
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
@@ -322,11 +327,6 @@ private fun NavigateScreenContent(
                 text = "Start Navigation",
                 onClick = {
                     viewModel.startNavigation()
-
-                    scope.launch {
-                        delay(250)
-                        bringIntoViewRequester.bringIntoView()
-                    }
                 }
             )
         }
