@@ -6,7 +6,7 @@ import com.shrihari.smartcampusnavigator.ui.screens.navigate.model.Destination
 data class NavigateUiState(
 
     // Current node predicted by ML
-    val currentNode: String = "N13",
+    val currentNode: String = "N1",
 
     // Destination selected from UI
     val selectedDestination: Destination? = null,

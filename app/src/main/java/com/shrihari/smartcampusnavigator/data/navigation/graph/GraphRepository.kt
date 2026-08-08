@@ -11,7 +11,7 @@ object GraphRepository {
         GraphNode(
             id = "N1",
             position = Offset(741f, 134f),
-            neighbors = listOf("N2")
+            neighbors = listOf("N2","N10")
         ),
 
         GraphNode(
@@ -23,13 +23,13 @@ object GraphRepository {
         GraphNode(
             id = "N3",
             position = Offset(881f, 178f),
-            neighbors = listOf("N2")
+            neighbors = listOf("N2", "N4", "N6")
         ),
 
         GraphNode(
             id = "N4",
             position = Offset(881f, 347f),
-            neighbors = listOf("N2")
+            neighbors = listOf("N2", "N3")
         ),
 
         GraphNode(
@@ -41,7 +41,7 @@ object GraphRepository {
         GraphNode(
             id = "N6",
             position = Offset(988f, 228f),
-            neighbors = listOf("N2", "N28")
+            neighbors = listOf("N2", "N3", "N28")
         ),
 
         GraphNode(
@@ -65,7 +65,7 @@ object GraphRepository {
         GraphNode(
             id = "N10",
             position = Offset(678f, 209f),
-            neighbors = listOf("N2", "N11", "N12")
+            neighbors = listOf("N1", "N2", "N11", "N12")
         ),
 
         GraphNode(
@@ -83,13 +83,13 @@ object GraphRepository {
         GraphNode(
             id = "N13",
             position = Offset(350f, 259f),
-            neighbors = listOf("N12", "N15", "N16", "N27")
+            neighbors = listOf("N12", "N14", "N15", "N16", "N27")
         ),
 
         GraphNode(
             id = "N14",
             position = Offset(316f, 372f),
-            neighbors = listOf("N12", "N18", "N19", "N21", "N22")
+            neighbors = listOf("N12", "N13", "N18", "N19", "N21", "N22", "N27")
         ),
 
         GraphNode(
@@ -113,7 +113,7 @@ object GraphRepository {
         GraphNode(
             id = "N18",
             position = Offset(369f, 447f),
-            neighbors = listOf("N14")
+            neighbors = listOf("N14", "N21", "N22")
         ),
 
         GraphNode(
@@ -131,43 +131,43 @@ object GraphRepository {
         GraphNode(
             id = "N21",
             position = Offset(200f, 506f),
-            neighbors = listOf("N14")
+            neighbors = listOf("N14", "N18")
         ),
 
         GraphNode(
             id = "N22",
             position = Offset(222f, 403f),
-            neighbors = listOf("N14", "N23", "N25", "N26")
+            neighbors = listOf("N14", "N18", "N23", "N25", "N26")
         ),
 
         GraphNode(
             id = "N23",
             position = Offset(131f, 390f),
-            neighbors = listOf("N22", "N24")
+            neighbors = listOf("N22", "N24", "N25", "N26")
         ),
 
         GraphNode(
             id = "N24",
             position = Offset(81f, 356f),
-            neighbors = listOf("N23")
+            neighbors = listOf("N23", "N25", "N26")
         ),
 
         GraphNode(
             id = "N25",
             position = Offset(141f, 309f),
-            neighbors = listOf("N22")
+            neighbors = listOf("N22", "N23", "N24")
         ),
 
         GraphNode(
             id = "N26",
             position = Offset(200f, 312f),
-            neighbors = listOf("N22")
+            neighbors = listOf("N22", "N23", "N24")
         ),
 
         GraphNode(
             id = "N27",
             position = Offset(206f, 222f),
-            neighbors = listOf("N13")
+            neighbors = listOf("N13", "N14")
         ),
 
         GraphNode(

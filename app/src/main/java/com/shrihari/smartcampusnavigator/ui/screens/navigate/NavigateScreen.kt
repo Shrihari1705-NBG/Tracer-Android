@@ -304,11 +304,6 @@ private fun NavigateScreenContent(
                     }
                 }
 
-                Text(
-                    text = "Department Map",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
                 ZoomableMap(
                     route = uiState.route
                 )
