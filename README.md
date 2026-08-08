@@ -22,65 +22,89 @@ AI-Based BLE RSSI Fingerprinting Indoor Localization and Navigation System
   <img src="https://img.shields.io/badge/Status-Under%20Development-red" alt="Status"/>
 </p>
 
-Tracer is an AI-powered Android application that provides **BLE RSSI Fingerprinting-based Indoor Localization** and **Indoor Navigation** for smart campus environments.
+# Tracer – Smart Campus Indoor Navigation
 
-The project is being developed as a Final Year Engineering Major Project using modern Android development practices.
+Tracer is an AI-powered Android application that provides **BLE RSSI Fingerprinting-based Indoor Localization** and **Indoor Navigation** for smart campus environments. The application combines **BLE beacon scanning**, **ONNX-based machine learning localization**, and **A* pathfinding** to deliver real-time indoor navigation inside the Electronics & Communication Engineering (ECE) Department.
 
----
-
-# 🚀 Features
-
-- 📡 BLE Beacon Scanning
-- 📍 Indoor Localization using RSSI Fingerprinting
-- 🤖 AI-assisted Location Prediction
-- 🗺 Indoor Navigation
-- 📱 Modern Material 3 UI
-- 🧭 Augmented Reality Navigation (Future Scope)
-- 🏫 Smart Campus Support
+The project is being developed as a **Final Year Engineering Major Project** using modern Android development practices and currently includes a working **Left Wing Navigation MVP**.
 
 ---
 
-# 🏗 Architecture
+## 🚀 Features
+
+* 📡 BLE Beacon Scanning
+* 📍 RSSI Fingerprinting-based Indoor Localization
+* 🤖 ONNX Machine Learning Location Prediction
+* 🗺 A* Indoor Navigation
+* 🧭 Interactive Zoomable Department Map
+* 🎞 Animated Route Guidance
+* 📌 Live Current Location Display
+* 💾 Persistent Recent Destinations (DataStore)
+* 📱 Modern Material 3 UI
+* 🏫 Smart Campus Support
+* 🧭 Augmented Reality Navigation (Future Scope)
+
+---
+
+## 🏗 Architecture
 
 The application follows **MVVM Architecture**.
 
-```
+```text
 UI (Jetpack Compose)
         │
         ▼
 ViewModel
         │
         ▼
-Repository
+Repository Layer
         │
         ▼
-BLE + Localization Engine
+Localization Engine
+(BLE Scanner + ONNX Model)
+        │
+        ▼
+Navigation Engine
+(A* Pathfinding + Graph)
 ```
 
 ---
 
-# 🛠 Tech Stack
+## 🛠 Tech Stack
 
-| Technology | Usage |
-|------------|-------|
-| Kotlin | Programming Language |
-| Jetpack Compose | UI Toolkit |
-| Material 3 | Design System |
-| MVVM | Architecture |
-| Hilt | Dependency Injection |
-| BLE | Indoor Positioning |
-| RSSI Fingerprinting | Localization |
-| A* Algorithm | Indoor Navigation |
-| Android Studio | Development IDE |
+| Technology          | Usage                      |
+| ------------------- | -------------------------- |
+| Kotlin              | Programming Language       |
+| Jetpack Compose     | UI Toolkit                 |
+| Material 3          | Design System              |
+| MVVM                | Architecture               |
+| Hilt                | Dependency Injection       |
+| BLE                 | Indoor Positioning         |
+| RSSI Fingerprinting | Localization               |
+| ONNX Runtime        | Machine Learning Inference |
+| A* Algorithm        | Indoor Navigation          |
+| Android DataStore   | Persistent Storage         |
+| Android Studio      | Development IDE            |
 
 ---
 
-# 📂 Project Structure
+## 📂 Project Structure
 
-```
+```text
 Tracer-Android/
 
 ├── app/
+│   ├── data/
+│   │   ├── ble/
+│   │   ├── localization/
+│   │   ├── ml/
+│   │   ├── navigation/
+│   │   └── datastore/
+│   ├── domain/
+│   ├── ui/
+│   │   ├── screens/
+│   │   └── components/
+│   └── di/
 ├── branding/
 ├── gradle/
 ├── docs/ (Coming Soon)
@@ -89,124 +113,134 @@ Tracer-Android/
 
 ---
 
-# 🎨 Branding
+## 🎨 Branding
 
 The project maintains a dedicated branding system.
 
 See:
 
-```
+```text
 branding/
 ```
 
-for
+for:
 
-- Brand Guide
-- Design Assets
-- Color Palette
-- Screenshots
-- Mockups
-
----
-
-# 📱 Screenshots
-
-Application screenshots will be added as development progresses.
+* Brand Guide
+* Design Assets
+* Color Palette
+* Screenshots
+* Mockups
 
 ---
 
-# 🚧 Development Status
+## 📱 Screenshots
 
-Current Milestone
-
-✅ Project Initialization
-
-✅ Navigation Compose
-
-✅ MVVM Architecture
-
-✅ Hilt Integration
-
-✅ Tracer Branding
-
-🔄 Splash Screen Redesign
-
-🔄 Home Screen UI
-
-⬜ BLE Scanner
-
-⬜ Fingerprinting
-
-⬜ Localization
-
-⬜ Navigation
-
-⬜ AR Navigation
+Application screenshots and navigation demonstrations will be added as development progresses.
 
 ---
 
-# 🎯 Roadmap
+## 🚧 Development Status
 
-- BLE Scanning
-- RSSI Data Collection
-- Fingerprint Database
-- AI Localization
-- Indoor Navigation
-- Augmented Reality Guidance
+### Current Milestone
+
+* [x] Project Initialization
+* [x] Navigation Compose
+* [x] MVVM Architecture
+* [x] Hilt Integration
+* [x] Tracer Branding
+* [x] Material 3 UI
+* [x] BLE Scanner
+* [x] RSSI Fingerprinting Pipeline
+* [x] ONNX Localization Integration
+* [x] A* Indoor Navigation
+* [x] Interactive Zoomable Map
+* [x] Animated Route Visualization
+* [x] Recent Destination Persistence
+* [x] Left Wing Navigation MVP
+* [ ] Right Wing Mapping
+* [ ] Upper Floor Navigation
+* [ ] Multi-floor Navigation
+* [ ] AR Navigation
 
 ---
 
-# 📚 References
+## 🗺 Current Coverage
+
+The current prototype supports navigation across the **Left Wing of the ECE Department**, including:
+
+* Left Wing Entrance
+* Left Wing Corridor
+* Ladies Room
+* Faculty Cabin Area
+* DC Lab
+* Classrooms
+
+---
+
+## 🎯 Roadmap
+
+* Right Wing Integration
+* Real-time Moving User Cursor
+* Dynamic Route Shrinking During Walking
+* Voice Navigation Guidance
+* Arrival Notifications
+* Augmented Reality Indoor Guidance
+
+---
+
+## 📚 References
 
 The project is based on extensive research in:
 
-- BLE Indoor Localization
-- RSSI Fingerprinting
-- Machine Learning
-- A* Path Planning
-- Indoor Navigation
+* BLE Indoor Localization
+* RSSI Fingerprinting
+* Machine Learning for Indoor Positioning
+* ONNX Runtime Inference
+* A* Path Planning
+* Indoor Navigation Systems
 
 ---
 
-# 👨‍💻 Developers
+## 👨‍💻 Developers
 
-**Shrihari N B G**\
-**Shreesha M Tembe**\
-**Shubhangi S Naik**\
+**Shrihari N B G**
+
+**Shreesha M Tembe**
+
+**Shubhangi S Naik**
+
 **Vageesh I Gaonkar**
 
 Final Year Engineering Students
 
 ---
 
-# 📄 License
+## 📄 License
 
-This repository is currently maintained for academic and research purposes.
+This repository is currently maintained for **academic and research purposes**.
 
 An open-source license may be added in the future.
 
 ---
 
-# ⭐ Project Status
+## ⭐ Project Status
 
-## 🚧 Development Status
+### Current Status
 
-- [x] Project Initialization
-- [x] Navigation Compose
-- [x] MVVM Architecture
-- [x] Hilt Integration
-- [x] Tracer Branding
-- [x] Typography
-- [ ] Splash Screen
-- [ ] Home Screen
-- [ ] BLE Scanner
-- [ ] RSSI Fingerprinting
-- [ ] Localization
-- [ ] Indoor Navigation
-- [ ] AR Navigation
+* [x] BLE Beacon Scanning
+* [x] RSSI Fingerprinting Pipeline
+* [x] ONNX Localization
+* [x] A* Indoor Navigation
+* [x] Zoomable Interactive Map
+* [x] Animated Route Guidance
+* [x] Dynamic Current Location Display
+* [x] Recent Destination Persistence
+* [x] Left Wing Navigation MVP
+* [ ] Right Wing Navigation
+* [ ] AR Navigation
 
 ---
 
 ⭐ If you find this project interesting, consider giving it a star.
 
-Built with ❤️ using Kotlin and Jetpack Compose.
+Built with ❤️ using **Kotlin**, **Jetpack Compose**, and **ONNX Runtime**.
