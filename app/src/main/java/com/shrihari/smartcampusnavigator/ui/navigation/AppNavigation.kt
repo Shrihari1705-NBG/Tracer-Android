@@ -12,6 +12,8 @@ import com.shrihari.smartcampusnavigator.ui.screens.scan.ScanScreen
 import com.shrihari.smartcampusnavigator.ui.screens.navigate.NavigateScreen
 import com.shrihari.smartcampusnavigator.ui.screens.settings.SettingsScreen
 import com.shrihari.smartcampusnavigator.ui.theme.ThemeViewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 @Composable
 fun AppNavigation(
@@ -40,9 +42,22 @@ fun AppNavigation(
                 navController = navController
             )
         }
-        composable(route = Screen.Navigate.route) {
+        composable(
+            route = Screen.Navigate.route,
+            arguments = listOf(
+                navArgument("recent") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) { backStackEntry ->
+
+            val recent =
+                backStackEntry.arguments?.getBoolean("recent") ?: false
+
             NavigateScreen(
-                navController = navController
+                navController = navController,
+                openRecent = recent
             )
         }
         composable(Screen.Settings.route) {

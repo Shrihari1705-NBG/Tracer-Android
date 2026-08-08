@@ -4,19 +4,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shrihari.smartcampusnavigator.data.ble.BleScannerManager
+import com.shrihari.smartcampusnavigator.data.localization.LocalizationRepository
 import com.shrihari.smartcampusnavigator.data.ml.OnnxLocalizationManager
+import com.shrihari.smartcampusnavigator.data.navigation.repository.NavigationRepository
 import com.shrihari.smartcampusnavigator.domain.repository.HomeRepository
 import com.shrihari.smartcampusnavigator.ui.components.BottomNavItem
 import com.shrihari.smartcampusnavigator.ui.screens.home.HomeUiState
 import com.shrihari.smartcampusnavigator.utils.BluetoothManager
-import com.shrihari.smartcampusnavigator.data.localization.LocalizationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.shrihari.smartcampusnavigator.data.navigation.NodeNameMapper
+import com.shrihari.smartcampusnavigator.data.datastore.SettingsDataStore
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -29,7 +30,11 @@ class HomeViewModel @Inject constructor(
 
     private val onnxLocalizationManager: OnnxLocalizationManager,
 
-    private val localizationRepository: LocalizationRepository
+    private val localizationRepository: LocalizationRepository,
+
+    private val navigationRepository: NavigationRepository,
+
+    private val settingsDataStore: SettingsDataStore
 
 ) : ViewModel() {
 
@@ -76,26 +81,38 @@ class HomeViewModel @Inject constructor(
 
     private fun observeNavigationState() {
 
+        // Live current location
         viewModelScope.launch {
 
             localizationRepository.currentNode.collect { node ->
 
                 _uiState.update {
-                    it.copy(
-                        currentLocation = NodeNameMapper.getDisplayName(node)
-                    )
+                    it.copy(currentLocation = node)
                 }
             }
         }
 
+        // Persisted recent destination
         viewModelScope.launch {
 
-            localizationRepository.recentDestination.collect { destination ->
+            settingsDataStore.recentDestination.collect { destination ->
 
                 _uiState.update {
                     it.copy(recentDestination = destination)
                 }
             }
+        }
+    }
+
+    // ---------------------------------------------------------
+    // Navigate to Recent Destination
+    // ---------------------------------------------------------
+
+    fun navigateToRecentDestination() {
+        val destination = _uiState.value.recentDestination
+
+        if (destination != "No recent destination") {
+            navigationRepository.navigateTo(destination)
         }
     }
 

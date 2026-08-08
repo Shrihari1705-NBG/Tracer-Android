@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,80 +36,111 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    HomeScreenContent(
+    var showRecentDialog by remember { mutableStateOf(false) }
 
+    HomeScreenContent(
         uiState = uiState,
 
-        onBottomNavSelected = { item ->
-
-            when (item) {
-
-                BottomNavItem.Home ->
-                    navController.navigate(Screen.Home.route)
-
-                BottomNavItem.Scan ->
-                    navController.navigate(Screen.Scan.route)
-
-                BottomNavItem.Navigate ->
-                    navController.navigate(Screen.Navigate.route)
-
-                BottomNavItem.Settings ->
-                    navController.navigate(Screen.Settings.route)
-
+        onRecentDestinationClick = {
+            if (uiState.recentDestination != "No recent destination") {
+                showRecentDialog = true
             }
+        },
 
+        onBottomNavSelected = { item ->
+            when (item) {
+                BottomNavItem.Home -> {
+                    navController.navigate(Screen.Home.route)
+                }
+
+                BottomNavItem.Scan -> {
+                    navController.navigate(Screen.Scan.route)
+                }
+
+                BottomNavItem.Navigate -> {
+                    viewModel.navigateToRecentDestination()
+                    navController.navigate(Screen.Navigate.route)
+                }
+
+                BottomNavItem.Settings -> {
+                    navController.navigate(Screen.Settings.route)
+                }
+            }
         },
 
         onStartScan = {
-
             viewModel.onStartScan()
-
         },
 
         onActualNodeSelected = {
-
             viewModel.onActualNodeSelected(it)
-
         }
-
     )
 
+    if (showRecentDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showRecentDialog = false
+            },
+
+            title = {
+                Text("Navigate again?")
+            },
+
+            text = {
+                Text("Do you want to navigate to ${uiState.recentDestination} again?")
+            },
+
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showRecentDialog = false
+                        viewModel.navigateToRecentDestination()
+                        navController.navigate("navigate?recent=true")
+                    }
+                ) {
+                    Text("Navigate")
+                }
+            },
+
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showRecentDialog = false
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable
 private fun HomeScreenContent(
-
     uiState: HomeUiState,
+
+    onRecentDestinationClick: () -> Unit,
 
     onBottomNavSelected: (BottomNavItem) -> Unit,
 
     onStartScan: () -> Unit,
 
     onActualNodeSelected: (String) -> Unit
-
 ) {
 
     Scaffold(
-
         bottomBar = {
-
             BottomNavBar(
-
                 selectedItem = uiState.selectedBottomNav,
-
                 onItemSelected = onBottomNavSelected
-
             )
-
         }
-
     ) { innerPadding ->
 
         Column(
-
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -115,61 +148,41 @@ private fun HomeScreenContent(
                 .padding(16.dp),
 
             verticalArrangement = Arrangement.spacedBy(16.dp)
-
         ) {
 
             TracerTopBar(
-
                 title = "Tracer",
-
                 subtitle = "Indoor Navigation for Smart Campuses",
-
                 logo = painterResource(id = R.drawable.tracer_logo)
-
             )
 
             WelcomeBanner(
-
                 title = "Welcome",
-
                 message = "Ready to navigate your campus?"
-
             )
 
             CurrentLocationCard(
-
                 location = uiState.currentLocation
-
             )
 
             RecentDestinationCard(
-                destination = uiState.recentDestination
+                destination = uiState.recentDestination,
+                onClick = onRecentDestinationClick
             )
 
             SystemStatusCard(
-
                 bluetoothEnabled = uiState.bluetoothEnabled,
-
                 scannerStatus = uiState.scannerStatus
-
             )
 
             LocalizationCard(
-
                 predictedNode = uiState.predictedNode,
-
                 selectedActualNode = uiState.selectedActualNode,
-
                 onActualNodeSelected = onActualNodeSelected,
-
                 onStartScan = onStartScan
-
             )
-
         }
-
     }
-
 }
 
 @Preview(showBackground = true)
@@ -179,17 +192,15 @@ private fun HomePreview() {
     TracerTheme {
 
         HomeScreenContent(
-
             uiState = HomeUiState(),
+
+            onRecentDestinationClick = {},
 
             onBottomNavSelected = {},
 
             onStartScan = {},
 
             onActualNodeSelected = {}
-
         )
-
     }
-
 }

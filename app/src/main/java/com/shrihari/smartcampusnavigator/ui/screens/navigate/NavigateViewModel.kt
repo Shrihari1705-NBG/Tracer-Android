@@ -2,6 +2,7 @@ package com.shrihari.smartcampusnavigator.ui.screens.navigate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shrihari.smartcampusnavigator.data.datastore.SettingsDataStore
 import com.shrihari.smartcampusnavigator.data.localization.LocalizationRepository
 import com.shrihari.smartcampusnavigator.data.navigation.algorithm.PathFinder
 import com.shrihari.smartcampusnavigator.ui.screens.navigate.model.Destination
@@ -11,11 +12,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.shrihari.smartcampusnavigator.ui.screens.navigate.model.DestinationData
 
 @HiltViewModel
 class NavigateViewModel @Inject constructor(
-    private val localizationRepository: LocalizationRepository
+    private val localizationRepository: LocalizationRepository,
+    private val settingsDataStore: SettingsDataStore
 ) : ViewModel() {
+
 
     private val _uiState = MutableStateFlow(NavigateUiState())
     val uiState = _uiState.asStateFlow()
@@ -66,12 +70,37 @@ class NavigateViewModel @Inject constructor(
         }
     }
 
+    fun startRecentNavigation() {
+
+        viewModelScope.launch {
+
+            settingsDataStore.recentDestination.collect { destinationName ->
+
+                if (destinationName != "No recent destination") {
+
+                    val destination = DestinationData.destinations.find {
+                        it.name == destinationName
+                    }
+
+                    if (destination != null) {
+
+                        _uiState.update {
+                            it.copy(selectedDestination = destination)
+                        }
+
+                        startNavigation()
+                    }
+
+                    return@collect
+                }
+            }
+        }
+    }
+
     /**
      * User selects a destination.
      */
     fun selectDestination(destination: Destination) {
-
-        localizationRepository.updateRecentDestination(destination.name)
 
         _uiState.update {
             it.copy(selectedDestination = destination)
@@ -86,6 +115,11 @@ class NavigateViewModel @Inject constructor(
         val state = _uiState.value
 
         val destination = state.selectedDestination ?: return
+
+        // Save recent destination immediately
+        viewModelScope.launch {
+            settingsDataStore.setRecentDestination(destination.name)
+        }
 
         val path = PathFinder.findPath(
             startNodeId = state.currentNode,
@@ -132,4 +166,5 @@ class NavigateViewModel @Inject constructor(
             )
         }
     }
+
 }

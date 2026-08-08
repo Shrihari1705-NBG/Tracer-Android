@@ -8,7 +8,7 @@ sealed class Screen(val route: String) {
 
     object Scan : Screen("scan_screen")
 
-    object Navigate : Screen("navigate_screen")
+    object Navigate : Screen("navigate?recent={recent}")
 
     object Settings : Screen("settings_screen")
 }

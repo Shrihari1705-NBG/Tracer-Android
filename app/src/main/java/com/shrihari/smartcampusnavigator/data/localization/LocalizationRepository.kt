@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.shrihari.smartcampusnavigator.ui.screens.navigate.model.Destination
 
 @Singleton
 class LocalizationRepository @Inject constructor() {
@@ -14,14 +15,14 @@ class LocalizationRepository @Inject constructor() {
     val currentNode: StateFlow<String> = _currentNode.asStateFlow()
 
     // Last selected destination
-    private val _recentDestination = MutableStateFlow("No recent destination")
-    val recentDestination: StateFlow<String> = _recentDestination.asStateFlow()
+    private val _recentDestination = MutableStateFlow<Destination?>(null)
+    val recentDestination: StateFlow<Destination?> = _recentDestination.asStateFlow()
 
     fun updateCurrentNode(node: String) {
         _currentNode.value = node
     }
 
-    fun updateRecentDestination(destination: String) {
+    fun updateRecentDestination(destination: Destination) {
         _recentDestination.value = destination
     }
 }
