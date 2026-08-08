@@ -9,6 +9,7 @@ import com.shrihari.smartcampusnavigator.domain.repository.HomeRepository
 import com.shrihari.smartcampusnavigator.ui.components.BottomNavItem
 import com.shrihari.smartcampusnavigator.ui.screens.home.HomeUiState
 import com.shrihari.smartcampusnavigator.utils.BluetoothManager
+import com.shrihari.smartcampusnavigator.data.localization.LocalizationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +26,9 @@ class HomeViewModel @Inject constructor(
 
     private val bleScannerManager: BleScannerManager,
 
-    private val onnxLocalizationManager: OnnxLocalizationManager
+    private val onnxLocalizationManager: OnnxLocalizationManager,
+
+    private val localizationRepository: LocalizationRepository
 
 ) : ViewModel() {
 
@@ -176,6 +179,8 @@ class HomeViewModel @Inject constructor(
 
                 val predictedNode =
                     onnxLocalizationManager.predictNode(rssiVector)
+
+                localizationRepository.updateCurrentNode(predictedNode)
 
                 Log.d(
                     "TRACER_ML",

@@ -12,20 +12,13 @@ object PathFinder {
 
         val nodes = GraphRepository.nodes
 
-        val startNode = nodes.find {
-            it.id == startNodeId
-        } ?: return emptyList()
-
-        val destinationNode = nodes.find {
-            it.id == destinationNodeId
-        } ?: return emptyList()
+        val startNode = nodes.find { it.id == startNodeId } ?: return emptyList()
+        val destinationNode = nodes.find { it.id == destinationNodeId } ?: return emptyList()
 
         return AStarAlgorithm.findPath(
             start = startNode,
             goal = destinationNode,
             allNodes = nodes
         )
-
     }
-
 }
