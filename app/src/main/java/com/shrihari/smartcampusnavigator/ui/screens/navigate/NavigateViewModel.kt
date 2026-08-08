@@ -71,6 +71,8 @@ class NavigateViewModel @Inject constructor(
      */
     fun selectDestination(destination: Destination) {
 
+        localizationRepository.updateRecentDestination(destination.name)
+
         _uiState.update {
             it.copy(selectedDestination = destination)
         }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.shrihari.smartcampusnavigator.data.navigation.NodeNameMapper
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -43,6 +44,7 @@ class HomeViewModel @Inject constructor(
 
         observeBeaconStatus()
 
+        observeNavigationState()
     }
 
     // ---------------------------------------------------------
@@ -65,6 +67,36 @@ class HomeViewModel @Inject constructor(
 
         }
 
+    }
+
+    // ---------------------------------------------------------
+    // Observer Navigation State
+    // ---------------------------------------------------------
+
+
+    private fun observeNavigationState() {
+
+        viewModelScope.launch {
+
+            localizationRepository.currentNode.collect { node ->
+
+                _uiState.update {
+                    it.copy(
+                        currentLocation = NodeNameMapper.getDisplayName(node)
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
+
+            localizationRepository.recentDestination.collect { destination ->
+
+                _uiState.update {
+                    it.copy(recentDestination = destination)
+                }
+            }
+        }
     }
 
     // ---------------------------------------------------------

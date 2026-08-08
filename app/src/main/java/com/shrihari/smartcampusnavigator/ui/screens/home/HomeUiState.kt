@@ -10,7 +10,9 @@ data class HomeUiState(
 
     val scannerStatus: String = "Ready",
 
-    val currentLocation: String = "Not Available",
+    val currentLocation: String = "N13",
+
+    val recentDestination: String = "No recent destination",
 
     val predictedNode: String = "Waiting...",
 

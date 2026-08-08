@@ -143,9 +143,7 @@ private fun HomeScreenContent(
             )
 
             RecentDestinationCard(
-
-                destination = "No recent destination"
-
+                destination = uiState.recentDestination
             )
 
             SystemStatusCard(
