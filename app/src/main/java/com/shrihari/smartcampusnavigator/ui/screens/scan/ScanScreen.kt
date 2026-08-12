@@ -28,6 +28,17 @@ import com.shrihari.smartcampusnavigator.ui.components.TimerCard
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.QrCodeScanner
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 
 
 @Composable
@@ -191,6 +202,44 @@ private fun ScanScreenContent(
                     viewModel.exportCsv()
                 }
             )
+
+
+            // ---------------------------------------------------------
+            // QR Handoff Scanner
+            // ---------------------------------------------------------
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
+                    Text(
+                        text = "Continue from Tracer Kiosk",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Text(
+                        text = "Scan the QR code displayed on the Tracer Kiosk to continue navigation on your phone.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    PrimaryButton(
+                        text = "Open QR Scanner",
+                        onClick = {
+                            navController.navigate(Screen.QrScanner.route)
+                        }
+                    )
+                }
+            }
 
         }
 

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -7,8 +8,7 @@
         android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
 
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <!-- Android 11 and below -->
     <uses-permission
@@ -22,6 +22,14 @@
     <uses-permission
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
+
+    <!-- Camera permission for QR scanning -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Camera is optional -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <!-- BLE feature -->
     <uses-feature
@@ -39,6 +47,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartCampusNavigator">
 
+        <!-- Portrait-only QR scanner activity -->
+        <activity
+            android:name=".ui.screens.scan.PortraitCaptureActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SmartCampusNavigator" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -46,9 +60,22 @@
             android:theme="@style/Theme.SmartCampusNavigator"
             android:windowSoftInputMode="adjustResize">
 
+            <!-- Launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Tracer QR Handoff Deep Link -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="tracer"
+                    android:host="navigate" />
             </intent-filter>
 
         </activity>

@@ -36,16 +36,14 @@ import com.shrihari.smartcampusnavigator.ui.screens.navigate.components.Destinat
 import com.shrihari.smartcampusnavigator.ui.screens.navigate.components.ZoomableMap
 import com.shrihari.smartcampusnavigator.ui.screens.navigate.model.DestinationCategory
 import com.shrihari.smartcampusnavigator.ui.screens.navigate.model.DestinationData
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import android.util.Log
 
 @Composable
 fun NavigateScreen(
     navController: NavController,
     openRecent: Boolean = false,
-    viewModel: NavigateViewModel = hiltViewModel()
+    viewModel: NavigateViewModel = hiltViewModel(),
+    deepLinkDestination: String?
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -57,6 +55,43 @@ fun NavigateScreen(
 
         }
 
+    }
+
+    LaunchedEffect(deepLinkDestination) {
+
+        if (!deepLinkDestination.isNullOrBlank()) {
+
+            val normalizedDeepLink = deepLinkDestination
+                .lowercase()
+                .replace(".", "")
+                .replace("-", " ")
+                .replace("&", "and")
+                .trim()
+                .replace(Regex("\\\\s+"), "_")
+
+            val matchedDestination = DestinationData.destinations.find { destination ->
+
+                val destinationId = destination.name
+                    .lowercase()
+                    .replace(".", "")
+                    .replace("-", " ")
+                    .replace("&", "and")
+                    .trim()
+                    .replace(Regex("\\\\s+"), "_")
+
+                destinationId == normalizedDeepLink
+            }
+
+            Log.d(
+                "TracerDeepLink",
+                "Normalized=$normalizedDeepLink, Match=${matchedDestination?.name}"
+            )
+
+            matchedDestination?.let {
+                viewModel.selectDestination(it)
+                viewModel.startNavigation()
+            }
+        }
     }
 
     NavigateScreenContent(
