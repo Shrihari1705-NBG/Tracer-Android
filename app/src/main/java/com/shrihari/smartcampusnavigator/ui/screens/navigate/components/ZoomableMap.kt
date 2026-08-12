@@ -30,6 +30,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.shrihari.smartcampusnavigator.R
 import com.shrihari.smartcampusnavigator.data.navigation.graph.GraphNode
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 
 @Composable
 fun ZoomableMap(
@@ -41,6 +43,27 @@ fun ZoomableMap(
     var offset by remember { mutableStateOf(Offset.Zero) }
 
     val pathProgress = rememberPathAnimation(route.size)
+
+    val cursorX = remember { Animatable(0f) }
+    val cursorY = remember { Animatable(0f) }
+
+    LaunchedEffect(route.firstOrNull()?.id) {
+
+        if (route.isNotEmpty()) {
+
+            val target = route.first().position
+
+            cursorX.animateTo(
+                target.x,
+                animationSpec = tween(durationMillis = 500)
+            )
+
+            cursorY.animateTo(
+                target.y,
+                animationSpec = tween(durationMillis = 500)
+            )
+        }
+    }
 
     // ---------------------------------------------------------
     // Auto-frame the current route whenever it changes
@@ -240,24 +263,21 @@ fun ZoomableMap(
 
                 if (route.isNotEmpty()) {
 
-                    val current = route.first().position
+                    val animatedPosition = Offset(
+                        cursorX.value * scaleX,
+                        cursorY.value * scaleY
+                    )
 
                     drawCircle(
                         color = Color.White,
                         radius = 14f,
-                        center = Offset(
-                            current.x * scaleX,
-                            current.y * scaleY
-                        )
+                        center = animatedPosition
                     )
 
                     drawCircle(
                         color = Color(0xFF1565C0),
                         radius = 10f,
-                        center = Offset(
-                            current.x * scaleX,
-                            current.y * scaleY
-                        )
+                        center = animatedPosition
                     )
                 }
 

@@ -42,27 +42,48 @@ class NavigateViewModel @Inject constructor(
                     it.copy(currentNode = node)
                 }
 
-                // If navigation is active, automatically recalculate the route
+                // -------------------------------------------------
+                // Locked navigation: never recalculate A*
+                // Only advance along the locked route
+                // -------------------------------------------------
+
                 if (_uiState.value.isNavigationActive) {
 
-                    val destination = _uiState.value.selectedDestination
+                    val currentRoute = _uiState.value.route
 
-                    if (destination != null) {
+                    if (currentRoute.isEmpty()) return@collect
 
-                        // Destination reached
-                        if (node == destination.nodeId) {
+                    val currentRouteNode = currentRoute.first().id
+
+                    // Already at the current route node
+                    if (node == currentRouteNode) {
+                        return@collect
+                    }
+
+                    // Check if the next expected node is reached
+                    if (currentRoute.size > 1) {
+
+                        val nextNode = currentRoute[1].id
+
+                        if (node == nextNode) {
+
+                            val remainingRoute = currentRoute.drop(1)
 
                             _uiState.update {
-                                it.copy(
-                                    route = emptyList(),
-                                    isNavigationActive = false
-                                )
+                                it.copy(route = remainingRoute)
                             }
 
-                        } else {
+                            // Destination reached
+                            if (remainingRoute.size == 1) {
 
-                            recalculateRoute()
-
+                                _uiState.update {
+                                    it.copy(
+                                        route = emptyList(),
+                                        lockedRoute = emptyList(),
+                                        isNavigationActive = false
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -113,10 +134,8 @@ class NavigateViewModel @Inject constructor(
     fun startNavigation() {
 
         val state = _uiState.value
-
         val destination = state.selectedDestination ?: return
 
-        // Save recent destination immediately
         viewModelScope.launch {
             settingsDataStore.setRecentDestination(destination.name)
         }
@@ -129,6 +148,7 @@ class NavigateViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 route = path,
+                lockedRoute = path,
                 isNavigationActive = true
             )
         }
@@ -162,6 +182,7 @@ class NavigateViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 route = emptyList(),
+                lockedRoute = emptyList(),
                 isNavigationActive = false
             )
         }

@@ -11,10 +11,12 @@ data class NavigateUiState(
     // Destination selected from UI
     val selectedDestination: Destination? = null,
 
-    // Generated A* path
+    // Remaining route shown on the map
     val route: List<GraphNode> = emptyList(),
+
+    // Original route that never changes
+    val lockedRoute: List<GraphNode> = emptyList(),
 
     // Navigation state
     val isNavigationActive: Boolean = false
-
 )
