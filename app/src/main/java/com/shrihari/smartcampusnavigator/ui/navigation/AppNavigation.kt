@@ -2,6 +2,8 @@ package com.shrihari.smartcampusnavigator.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,6 +18,7 @@ import com.shrihari.smartcampusnavigator.ui.screens.settings.SettingsScreen
 import com.shrihari.smartcampusnavigator.ui.screens.splash.SplashScreen
 import com.shrihari.smartcampusnavigator.ui.theme.ThemeViewModel
 import com.shrihari.smartcampusnavigator.ui.viewmodel.HomeViewModel
+import com.shrihari.smartcampusnavigator.ui.tutorial.TutorialManager
 
 @Composable
 fun AppNavigation(
@@ -25,87 +28,189 @@ fun AppNavigation(
 
     val navController = rememberNavController()
 
-// Automatically open the Navigation screen when launched from a Tracer Kiosk QR
+    val context = LocalContext.current
+
+    // ---------------------------------------------------------
+    // Shared Tutorial Manager
+    // ---------------------------------------------------------
+    //
+    // One TutorialManager is shared across the application.
+    // This prevents separate tutorial states being created
+    // for Home, Scan and Navigate.
+    //
+    // ---------------------------------------------------------
+
+    val tutorialManager = remember {
+        TutorialManager(context)
+    }
+
+    // ---------------------------------------------------------
+    // Kiosk QR Handoff
+    // ---------------------------------------------------------
+    //
+    // If Tracer is launched from a Tracer Kiosk QR code,
+    // directly open the Navigate screen.
+    //
+    // ---------------------------------------------------------
+
     LaunchedEffect(deepLinkDestination) {
+
         if (deepLinkDestination != null) {
+
             navController.navigate(
                 "navigate?recent=false&destination=$deepLinkDestination"
             ) {
-                popUpTo(Screen.Splash.route) { inclusive = false }
+
+                popUpTo(
+                    Screen.Splash.route
+                ) {
+                    inclusive = false
+                }
+
                 launchSingleTop = true
             }
         }
     }
+
+    // ---------------------------------------------------------
+    // Navigation Host
+    // ---------------------------------------------------------
 
     NavHost(
         navController = navController,
         startDestination = Screen.Splash.route
     ) {
 
-        composable(route = Screen.Splash.route) {
-            SplashScreen(navController = navController)
-        }
+        // =====================================================
+        // Splash Screen
+        // =====================================================
 
-        composable(route = Screen.Home.route) {
+        composable(
+            route = Screen.Splash.route
+        ) {
 
-            val homeViewModel: HomeViewModel = hiltViewModel()
-
-            HomeScreen(
-                navController = navController,
-                viewModel = homeViewModel
-            )
-        }
-
-        composable(route = Screen.Scan.route) {
-            ScanScreen(
+            SplashScreen(
                 navController = navController
             )
         }
 
-        composable(route = Screen.QrScanner.route) {
+        // =====================================================
+        // Home Screen
+        // =====================================================
+
+        composable(
+            route = Screen.Home.route
+        ) {
+
+            val homeViewModel: HomeViewModel =
+                hiltViewModel()
+
+            HomeScreen(
+                navController = navController,
+                viewModel = homeViewModel,
+                tutorialManager = tutorialManager
+            )
+        }
+
+        // =====================================================
+        // Scan Screen
+        // =====================================================
+
+        composable(
+            route = Screen.Scan.route
+        ) {
+
+            ScanScreen(
+                navController = navController,
+                tutorialManager = tutorialManager
+            )
+        }
+
+        // =====================================================
+        // QR Scanner Screen
+        // =====================================================
+
+        composable(
+            route = Screen.QrScanner.route
+        ) {
+
             QrScannerScreen(
                 navController = navController
             )
         }
 
+        // =====================================================
+        // Navigate Screen
+        // =====================================================
+
         composable(
-            route = "navigate?recent={recent}&destination={destination}",
+            route =
+                "navigate?recent={recent}&destination={destination}",
+
             arguments = listOf(
+
                 navArgument("recent") {
+
                     type = NavType.BoolType
+
                     defaultValue = false
                 },
+
                 navArgument("destination") {
+
                     type = NavType.StringType
+
                     defaultValue = ""
                 }
             )
         ) { backStackEntry ->
 
             val recent =
-                backStackEntry.arguments?.getBoolean("recent") ?: false
+                backStackEntry
+                    .arguments
+                    ?.getBoolean("recent")
+                    ?: false
 
             val destination =
-                backStackEntry.arguments?.getString("destination")
+                backStackEntry
+                    .arguments
+                    ?.getString("destination")
 
             NavigateScreen(
                 navController = navController,
+
                 openRecent = recent,
-                deepLinkDestination = if (!destination.isNullOrBlank())
-                    destination
-                else
-                    deepLinkDestination
+
+                deepLinkDestination =
+                    if (!destination.isNullOrBlank()) {
+
+                        destination
+
+                    } else {
+
+                        deepLinkDestination
+                    },
+
+                // -------------------------------------------------
+                // Shared Tutorial Manager
+                // -------------------------------------------------
+
+                tutorialManager = tutorialManager
             )
         }
 
-        composable(Screen.Settings.route) {
+        // =====================================================
+        // Settings Screen
+        // =====================================================
+
+        composable(
+            route = Screen.Settings.route
+        ) {
 
             SettingsScreen(
                 navController = navController,
                 themeViewModel = themeViewModel
             )
-
         }
     }
-
 }

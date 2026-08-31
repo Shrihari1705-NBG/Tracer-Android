@@ -16,7 +16,10 @@ class CsvExportManager(
         samples: List<FingerprintSample>
     ): File {
 
-        // Folder
+        // --------------------------------------------------
+        // Export Folder
+        // --------------------------------------------------
+
         val exportFolder = File(
             context.getExternalFilesDir(null),
             "Tracer"
@@ -26,7 +29,10 @@ class CsvExportManager(
             exportFolder.mkdirs()
         }
 
+        // --------------------------------------------------
         // File Name
+        // --------------------------------------------------
+
         val formatter = SimpleDateFormat(
             "yyyyMMdd_HHmmss",
             Locale.getDefault()
@@ -40,6 +46,10 @@ class CsvExportManager(
             fileName
         )
 
+        // --------------------------------------------------
+        // Write CSV
+        // --------------------------------------------------
+
         csvFile.bufferedWriter().use { writer ->
 
             // --------------------------------------------------
@@ -47,7 +57,7 @@ class CsvExportManager(
             // --------------------------------------------------
 
             writer.append(
-                "Timestamp,Node,B1,B2,B3,B4,B5,B6,B7"
+                "Timestamp,Node,Session,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15"
             )
 
             writer.newLine()
@@ -58,36 +68,45 @@ class CsvExportManager(
 
             samples.forEach { sample ->
 
+                // Timestamp
                 writer.append(
                     sample.timestamp.toString()
                 )
 
                 writer.append(",")
 
-                writer.append(sample.node)
+                // Node
+                writer.append(
+                    sample.node
+                )
 
-                for (i in 1..7) {
+                writer.append(",")
+
+                // Session
+                writer.append(
+                    sample.session.toString()
+                )
+
+                // --------------------------------------------------
+                // Export all 15 Tracer Beacons
+                // Missing beacon = -100 RSSI
+                // --------------------------------------------------
+
+                for (i in 1..15) {
 
                     writer.append(",")
 
                     writer.append(
-
                         sample.rssiValues[
                             "TRACER_B$i"
                         ]?.toString() ?: "-100"
-
                     )
-
                 }
 
                 writer.newLine()
-
             }
-
         }
 
         return csvFile
-
     }
-
 }

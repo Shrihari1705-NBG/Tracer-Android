@@ -46,10 +46,16 @@ class HomeViewModel @Inject constructor(
     // ---------------------------------------------------------
 
     private fun loadWelcomeMessage() {
+
         viewModelScope.launch {
+
             val message = repository.getWelcomeMessage()
+
             _uiState.update {
-                it.copy(welcomeMessage = message)
+
+                it.copy(
+                    welcomeMessage = message
+                )
             }
         }
     }
@@ -60,22 +66,37 @@ class HomeViewModel @Inject constructor(
 
     private fun observeNavigationState() {
 
-        // Live current location
+        // -----------------------------------------------------
+        // Live Current Location
+        // -----------------------------------------------------
+
         viewModelScope.launch {
+
             localizationRepository.currentNode.collect { node ->
+
                 _uiState.update {
+
                     it.copy(
-                        currentLocation = NodeNameMapper.getDisplayName(node)
+                        currentLocation =
+                            NodeNameMapper.getDisplayName(node)
                     )
                 }
             }
         }
 
-        // Persisted recent destination
+        // -----------------------------------------------------
+        // Persisted Recent Destination
+        // -----------------------------------------------------
+
         viewModelScope.launch {
+
             settingsDataStore.recentDestination.collect { destination ->
+
                 _uiState.update {
-                    it.copy(recentDestination = destination)
+
+                    it.copy(
+                        recentDestination = destination
+                    )
                 }
             }
         }
@@ -86,10 +107,15 @@ class HomeViewModel @Inject constructor(
     // ---------------------------------------------------------
 
     fun navigateToRecentDestination() {
-        val destination = _uiState.value.recentDestination
+
+        val destination =
+            _uiState.value.recentDestination
 
         if (destination != "No recent destination") {
-            navigationRepository.navigateTo(destination)
+
+            navigationRepository.navigateTo(
+                destination
+            )
         }
     }
 
@@ -98,10 +124,16 @@ class HomeViewModel @Inject constructor(
     // ---------------------------------------------------------
 
     private fun observeBluetoothState() {
+
         viewModelScope.launch {
+
             bluetoothManager.bluetoothState.collect { enabled ->
+
                 _uiState.update {
-                    it.copy(bluetoothEnabled = enabled)
+
+                    it.copy(
+                        bluetoothEnabled = enabled
+                    )
                 }
             }
         }
@@ -112,66 +144,176 @@ class HomeViewModel @Inject constructor(
     // ---------------------------------------------------------
 
     private fun observeBeaconStatus() {
+
         viewModelScope.launch {
+
             bleScannerManager.devices.collect { devices ->
 
+                // -------------------------------------------------
+                // Beacon Detection Status
+                // -------------------------------------------------
+
                 val status = when {
-                    !_uiState.value.bluetoothEnabled -> "Bluetooth Off"
-                    devices.isEmpty() -> "Waiting for Tracer Beacons..."
-                    devices.size == 1 -> "1 Beacon Detected"
-                    else -> "${devices.size} Beacons Detected"
+
+                    !_uiState.value.bluetoothEnabled ->
+                        "Bluetooth Off"
+
+                    devices.isEmpty() ->
+                        "Waiting for Tracer Beacons..."
+
+                    devices.size == 1 ->
+                        "1 Beacon Detected"
+
+                    else ->
+                        "${devices.size} Beacons Detected"
                 }
 
-                // ---------------------------------------------
-                // Build RSSI Vector
-                // Missing beacons = -100
-                // ---------------------------------------------
+                // -------------------------------------------------
+                // Build 15-Dimensional RSSI Vector
+                //
+                // B1  -> index 0
+                // B2  -> index 1
+                // ...
+                // B15 -> index 14
+                //
+                // Missing beacon = -100
+                // -------------------------------------------------
 
-                val rssiVector = FloatArray(7) { -100f }
+                val rssiVector =
+                    FloatArray(15) { -100f }
 
                 devices.forEach { device ->
+
                     when (device.name) {
-                        "TRACER_B1" -> rssiVector[0] = device.rssi.toFloat()
-                        "TRACER_B2" -> rssiVector[1] = device.rssi.toFloat()
-                        "TRACER_B3" -> rssiVector[2] = device.rssi.toFloat()
-                        "TRACER_B4" -> rssiVector[3] = device.rssi.toFloat()
-                        "TRACER_B5" -> rssiVector[4] = device.rssi.toFloat()
-                        "TRACER_B6" -> rssiVector[5] = device.rssi.toFloat()
-                        "TRACER_B7" -> rssiVector[6] = device.rssi.toFloat()
+
+                        "TRACER_B1" ->
+                            rssiVector[0] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B2" ->
+                            rssiVector[1] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B3" ->
+                            rssiVector[2] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B4" ->
+                            rssiVector[3] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B5" ->
+                            rssiVector[4] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B6" ->
+                            rssiVector[5] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B7" ->
+                            rssiVector[6] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B8" ->
+                            rssiVector[7] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B9" ->
+                            rssiVector[8] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B10" ->
+                            rssiVector[9] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B11" ->
+                            rssiVector[10] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B12" ->
+                            rssiVector[11] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B13" ->
+                            rssiVector[12] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B14" ->
+                            rssiVector[13] =
+                                device.rssi.toFloat()
+
+                        "TRACER_B15" ->
+                            rssiVector[14] =
+                                device.rssi.toFloat()
                     }
                 }
 
-                Log.d("TRACER_ML", "RSSI = ${rssiVector.joinToString()}")
+                // -------------------------------------------------
+                // Debug RSSI Vector
+                // -------------------------------------------------
 
-                // ---------------------------------------------------------
-                // Wait until at least one Tracer beacon is detected
-                // ---------------------------------------------------------
+                Log.d(
+                    "TRACER_ML",
+                    "RSSI(15) = ${rssiVector.joinToString()}"
+                )
+
+                // -------------------------------------------------
+                // Wait Until At Least One Tracer Beacon
+                // -------------------------------------------------
 
                 if (devices.isEmpty()) {
+
                     _uiState.update {
+
                         it.copy(
                             scannerStatus = status,
-                            predictedNode = "Waiting for Beacons..."
+                            predictedNode =
+                                "Waiting for Beacons..."
                         )
                     }
+
                     return@collect
                 }
 
-                // ---------------------------------------------
+                // -------------------------------------------------
                 // Predict Current Node
-                // ---------------------------------------------
+                // -------------------------------------------------
 
-                val predictedNode = onnxLocalizationManager.predictNode(rssiVector)
+                /*
+                 * IMPORTANT:
+                 *
+                 * The ONNX model currently installed in the
+                 * application must accept 15 input features.
+                 *
+                 * Until the final 15-beacon model is trained
+                 * and exported, this call will not work with
+                 * the old 7-feature model.
+                 */
 
-                localizationRepository.updateCurrentNode(predictedNode)
+                val predictedNode =
+                    onnxLocalizationManager.predictNode(
+                        rssiVector
+                    )
 
-                Log.d("TRACER_ML", "Prediction = $predictedNode")
+                // -------------------------------------------------
+                // Update Localization Repository
+                // -------------------------------------------------
 
-                // ---------------------------------------------
+                localizationRepository.updateCurrentNode(
+                    predictedNode
+                )
+
+                Log.d(
+                    "TRACER_ML",
+                    "Prediction = $predictedNode"
+                )
+
+                // -------------------------------------------------
                 // Update UI
-                // ---------------------------------------------
+                // -------------------------------------------------
 
                 _uiState.update {
+
                     it.copy(
                         scannerStatus = status,
                         predictedNode = predictedNode
@@ -181,9 +323,17 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    // ---------------------------------------------------------
+    // Actual Node Selection
+    // ---------------------------------------------------------
+
     fun onActualNodeSelected(node: String) {
+
         _uiState.update {
-            it.copy(selectedActualNode = node)
+
+            it.copy(
+                selectedActualNode = node
+            )
         }
     }
 
@@ -193,10 +343,18 @@ class HomeViewModel @Inject constructor(
 
     fun onStartScan() {
 
-        Log.d("HOME_SCAN", "Start Scan Button Pressed")
+        Log.d(
+            "HOME_SCAN",
+            "Start Scan Button Pressed"
+        )
 
         if (!_uiState.value.bluetoothEnabled) {
-            Log.d("HOME_SCAN", "Bluetooth OFF")
+
+            Log.d(
+                "HOME_SCAN",
+                "Bluetooth OFF"
+            )
+
             return
         }
 
@@ -207,9 +365,15 @@ class HomeViewModel @Inject constructor(
     // Bottom Navigation
     // ---------------------------------------------------------
 
-    fun onBottomNavSelected(item: BottomNavItem) {
+    fun onBottomNavSelected(
+        item: BottomNavItem
+    ) {
+
         _uiState.update {
-            it.copy(selectedBottomNav = item)
+
+            it.copy(
+                selectedBottomNav = item
+            )
         }
     }
 }

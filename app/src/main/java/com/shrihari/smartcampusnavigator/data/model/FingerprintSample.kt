@@ -6,6 +6,8 @@ data class FingerprintSample(
 
     val timestamp: Long,
 
+    val session: Int,
+
     val rssiValues: Map<String, Int>
 
 )

@@ -1,8 +1,12 @@
 package com.shrihari.smartcampusnavigator.ui.screens.scan
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.shrihari.smartcampusnavigator.data.ble.BleScannerManager
+import com.shrihari.smartcampusnavigator.data.export.CsvExportManager
 import com.shrihari.smartcampusnavigator.data.model.BleDevice
 import com.shrihari.smartcampusnavigator.data.model.FingerprintSample
 import com.shrihari.smartcampusnavigator.utils.BluetoothManager
@@ -15,11 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.shrihari.smartcampusnavigator.data.export.CsvExportManager
-import android.util.Log
-import android.widget.Toast
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
@@ -31,13 +30,41 @@ class ScanViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ScanUiState())
     val uiState = _uiState.asStateFlow()
 
+    // -------------------------------------------------------
+    // Fingerprint Samples
+    // -------------------------------------------------------
+
     // Stores all collected fingerprint samples
-    private val fingerprintSamples = mutableListOf<FingerprintSample>()
+    private val fingerprintSamples =
+        mutableListOf<FingerprintSample>()
+
+    // -------------------------------------------------------
+    // CSV Export
+    // -------------------------------------------------------
 
     private val csvExportManager =
         CsvExportManager(getApplication())
 
+    // -------------------------------------------------------
+    // Timer
+    // -------------------------------------------------------
+
     private var timerJob: Job? = null
+
+    // -------------------------------------------------------
+    // Session
+    // -------------------------------------------------------
+
+    /*
+     * Current collection session.
+     *
+     * Session 1 = first collection session
+     * Session 2 = second collection session
+     * Session 3 = third collection session
+     * Session 4 = fourth collection session
+     * Session 5 = fifth collection session
+     */
+    private var currentSession = 1
 
     init {
         observeBluetoothState()
@@ -55,7 +82,28 @@ class ScanViewModel @Inject constructor(
                 selectedNode = node
             )
         }
+    }
 
+    // -------------------------------------------------------
+    // Session Selection
+    // -------------------------------------------------------
+
+    fun setSession(session: Int) {
+
+        if (session !in 1..5) {
+            Log.d(
+                "TRACER_SESSION",
+                "Invalid session: $session"
+            )
+            return
+        }
+
+        currentSession = session
+
+        Log.d(
+            "TRACER_SESSION",
+            "Current Session = $currentSession"
+        )
     }
 
     // -------------------------------------------------------
@@ -73,6 +121,16 @@ class ScanViewModel @Inject constructor(
 
         fingerprintSamples.clear()
 
+        Log.d(
+            "TRACER_SESSION",
+            "Starting Session $currentSession"
+        )
+
+        Log.d(
+            "TRACER_DATA",
+            "Collecting Node = ${_uiState.value.selectedNode}"
+        )
+
         bleScannerManager.startScan()
 
         startTimer()
@@ -83,11 +141,19 @@ class ScanViewModel @Inject constructor(
         bleScannerManager.stopScan()
 
         timerJob?.cancel()
+
+        Log.d(
+            "TRACER_SESSION",
+            "Session $currentSession stopped"
+        )
     }
+
     fun toggleScan() {
 
         if (_uiState.value.isScanning) {
+
             stopScan()
+
             return
         }
 
@@ -112,7 +178,6 @@ class ScanViewModel @Inject constructor(
                 showBluetoothDialog = false
             )
         }
-
     }
 
     // -------------------------------------------------------
@@ -130,13 +195,9 @@ class ScanViewModel @Inject constructor(
                     it.copy(
                         bluetoothEnabled = enabled
                     )
-
                 }
-
             }
-
         }
-
     }
 
     // -------------------------------------------------------
@@ -144,6 +205,10 @@ class ScanViewModel @Inject constructor(
     // -------------------------------------------------------
 
     private fun observeScannerState() {
+
+        // ---------------------------------------------------
+        // Nearby Devices
+        // ---------------------------------------------------
 
         viewModelScope.launch {
 
@@ -156,34 +221,35 @@ class ScanViewModel @Inject constructor(
                             device.name
                         }
                     )
-
                 }
 
-                // Save one fingerprint sample whenever devices update
+                // Save one fingerprint sample whenever
+                // the BLE device list is updated.
                 collectFingerprint(devices)
-
             }
-
         }
+
+        // ---------------------------------------------------
+        // Scanner State
+        // ---------------------------------------------------
 
         viewModelScope.launch {
 
-                bleScannerManager.isScanning.collect { scanning ->
+            bleScannerManager.isScanning.collect { scanning ->
 
-                    _uiState.update {
-                        it.copy(
-                            isScanning = scanning
-                        )
-                    }
+                _uiState.update {
 
-                    if (!scanning) {
-                        timerJob?.cancel()
-                    }
+                    it.copy(
+                        isScanning = scanning
+                    )
                 }
 
+                if (!scanning) {
 
+                    timerJob?.cancel()
+                }
+            }
         }
-
     }
 
     // -------------------------------------------------------
@@ -194,47 +260,91 @@ class ScanViewModel @Inject constructor(
         devices: List<BleDevice>
     ) {
 
-        if (!_uiState.value.isScanning) return
+        if (!_uiState.value.isScanning) {
+            return
+        }
+
+        // ---------------------------------------------------
+        // Build RSSI Map
+        // ---------------------------------------------------
 
         val rssiMap = devices
             .filter { !it.name.isNullOrBlank() }
             .associate { device ->
+
                 device.name!! to device.rssi
             }
 
-        fingerprintSamples.add(
+        // ---------------------------------------------------
+        // Create Fingerprint Sample
+        // ---------------------------------------------------
 
-            FingerprintSample(
+        val sample = FingerprintSample(
 
-                node = _uiState.value.selectedNode,
+            node = _uiState.value.selectedNode,
 
-                timestamp = System.currentTimeMillis(),
+            timestamp = System.currentTimeMillis(),
 
-                rssiValues = rssiMap
+            session = currentSession,
 
-            )
-
+            rssiValues = rssiMap
         )
 
-        Log.d("TRACER_DATA", "----------------------------")
-        Log.d("TRACER_DATA", "Node = ${_uiState.value.selectedNode}")
-        Log.d("TRACER_DATA", "Sample = ${fingerprintSamples.size}")
+        fingerprintSamples.add(sample)
+
+        // ---------------------------------------------------
+        // Debug Logging
+        // ---------------------------------------------------
+
+        Log.d(
+            "TRACER_DATA",
+            "----------------------------"
+        )
+
+        Log.d(
+            "TRACER_DATA",
+            "Node = ${_uiState.value.selectedNode}"
+        )
+
+        Log.d(
+            "TRACER_DATA",
+            "Session = $currentSession"
+        )
+
+        Log.d(
+            "TRACER_DATA",
+            "Sample = ${fingerprintSamples.size}"
+        )
 
         rssiMap.forEach { (beacon, rssi) ->
-            Log.d("TRACER_DATA", "$beacon : $rssi")
+
+            Log.d(
+                "TRACER_DATA",
+                "$beacon : $rssi"
+            )
         }
 
-        Log.d("TRACER_DATA", "----------------------------")
+        Log.d(
+            "TRACER_DATA",
+            "----------------------------"
+        )
+
+        // ---------------------------------------------------
+        // Update Sample Count
+        // ---------------------------------------------------
 
         _uiState.update {
 
             it.copy(
                 sampleCount = fingerprintSamples.size
             )
-
         }
-
     }
+
+    // -------------------------------------------------------
+    // Timer
+    // -------------------------------------------------------
+
     private fun startTimer() {
 
         timerJob?.cancel()
@@ -243,13 +353,17 @@ class ScanViewModel @Inject constructor(
 
             var seconds = 0L
 
-            while (isActive && _uiState.value.isScanning) {
+            while (
+                isActive &&
+                _uiState.value.isScanning
+            ) {
 
                 delay(1000)
 
                 seconds++
 
                 _uiState.update {
+
                     it.copy(
                         elapsedTime = seconds
                     )
@@ -257,6 +371,11 @@ class ScanViewModel @Inject constructor(
             }
         }
     }
+
+    // -------------------------------------------------------
+    // CSV Export
+    // -------------------------------------------------------
+
     fun exportCsv() {
 
         if (fingerprintSamples.isEmpty()) {
@@ -271,7 +390,9 @@ class ScanViewModel @Inject constructor(
         }
 
         val file = csvExportManager.exportSamples(
+
             node = _uiState.value.selectedNode,
+
             samples = fingerprintSamples
         )
 
@@ -281,9 +402,34 @@ class ScanViewModel @Inject constructor(
             Toast.LENGTH_LONG
         ).show()
 
+        Log.d(
+            "TRACER_EXPORT",
+            "CSV Exported -> ${file.absolutePath}"
+        )
+
+        Log.d(
+            "TRACER_EXPORT",
+            "Node = ${_uiState.value.selectedNode}"
+        )
+
+        Log.d(
+            "TRACER_EXPORT",
+            "Session = $currentSession"
+        )
+
+        Log.d(
+            "TRACER_EXPORT",
+            "Samples = ${fingerprintSamples.size}"
+        )
+
+        // ---------------------------------------------------
+        // Clear Current Collection
+        // ---------------------------------------------------
+
         fingerprintSamples.clear()
 
         _uiState.update {
+
             it.copy(
                 sampleCount = 0,
                 elapsedTime = 0L
@@ -291,11 +437,5 @@ class ScanViewModel @Inject constructor(
         }
 
         timerJob?.cancel()
-
-        Log.d(
-            "TRACER_EXPORT",
-            "CSV Exported -> ${file.absolutePath}"
-        )
     }
-
 }
