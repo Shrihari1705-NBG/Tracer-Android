@@ -19,21 +19,36 @@ AI-Based BLE RSSI Fingerprinting Indoor Localization and Navigation System
   <img src="https://img.shields.io/badge/Kotlin-2.2-blue" alt="Kotlin"/>
   <img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4" alt="Jetpack Compose"/>
   <img src="https://img.shields.io/badge/Architecture-MVVM-orange" alt="MVVM"/>
+<<<<<<< HEAD
   <img src="https://img.shields.io/badge/Status-Project%20Complete-success" alt="Project Status"/>
+=======
+  <img src="https://img.shields.io/badge/Status-Final%20Stage-success" alt="Status"/>
+>>>>>>> 95624f4ddac893698aa4d639f2f6ef1d471ed30c
 </p>
 
 # Tracer – Smart Campus Indoor Navigation
 
+<<<<<<< HEAD
 Tracer is an AI-powered Android application designed for **BLE RSSI Fingerprinting-based Indoor Localization and Navigation** in smart campus environments.
 
 The system combines **Bluetooth Low Energy (BLE) beacon scanning**, **RSSI fingerprinting**, **machine learning-based localization**, and **A* pathfinding** to provide indoor navigation inside the Electronics & Communication Engineering (ECE) Department.
 
 Tracer is developed as a **Final Year Engineering Major Project** using modern Android development practices. The project integrates the complete pipeline from RSSI data collection and fingerprint-based localization to destination selection and route guidance.
+=======
+Tracer is an **AI-assisted Android indoor navigation system** designed for smart campus environments.
+
+The system uses **Bluetooth Low Energy (BLE) RSSI fingerprinting** to estimate the user's indoor location and combines the predicted location with **A* pathfinding** to provide indoor navigation.
+
+The project is developed as a **Final Year Engineering Major Project** and is designed for indoor navigation within the **Electronics & Communication Engineering (ECE) Department**.
+
+The current implementation integrates the complete pipeline from **BLE signal acquisition and fingerprinting to localization and route guidance**.
+>>>>>>> 95624f4ddac893698aa4d639f2f6ef1d471ed30c
 
 ---
 
-## 🚀 Features
+# 🚀 Key Features
 
+<<<<<<< HEAD
 * 📡 BLE Beacon Scanning
 * 📊 RSSI Fingerprint Data Collection
 * 📍 RSSI Fingerprinting-based Indoor Localization
@@ -662,3 +677,96 @@ Smart Campus Indoor Navigation
 <p align="center">
   <b>Tracer — Making Indoor Campus Navigation Smarter.</b>
 </p>
+=======
+### 📡 BLE-Based Localization
+
+* BLE beacon scanning
+* Real-time RSSI acquisition
+* Multi-beacon RSSI fingerprint generation
+* Session-based fingerprint data collection
+* Indoor fingerprint database generation
+
+### 🤖 Machine Learning Localization
+
+* RSSI fingerprint-based indoor localization
+* Supervised machine learning models
+* K-Nearest Neighbors (KNN)
+* Random Forest
+* Support Vector Machine (SVM)
+* Model evaluation and comparison
+* ONNX-based model inference integration
+
+### 🗺 Indoor Navigation
+
+* A* pathfinding algorithm
+* Indoor navigation graph
+* Node-based route planning
+* Current-location-aware navigation
+* Interactive department map
+* Zoomable and pannable map
+* Animated route visualization
+* Destination selection
+
+### 📱 Android Application
+
+* Modern Jetpack Compose UI
+* Material 3 design
+* MVVM architecture
+* Hilt dependency injection
+* BLE permission handling
+* QR-based navigation handoff
+* Persistent recent destinations
+* First-launch tutorial
+* Dark/light theme support
+
+---
+
+# 🧠 System Architecture
+
+Tracer follows a layered **MVVM-based architecture**.
+
+```text
+                    ┌───────────────────────┐
+                    │     Jetpack Compose   │
+                    │          UI           │
+                    └───────────┬───────────┘
+                                │
+                                ▼
+                    ┌───────────────────────┐
+                    │       ViewModel       │
+                    │   Application Logic   │
+                    └───────────┬───────────┘
+                                │
+                                ▼
+                    ┌───────────────────────┐
+                    │     Data / Domain     │
+                    │       Layer           │
+                    └───────────┬───────────┘
+                                │
+                 ┌──────────────┴──────────────┐
+                 ▼                             ▼
+        ┌─────────────────┐          ┌─────────────────┐
+        │   BLE Scanner   │          │   Navigation    │
+        │                 │          │     Engine      │
+        └────────┬────────┘          └────────┬────────┘
+                 │                            │
+                 ▼                            ▼
+        ┌─────────────────┐          ┌─────────────────┐
+        │  RSSI Feature   │          │  A* Pathfinding │
+        │   Generation    │          │      Graph      │
+        └────────┬────────┘          └─────────────────┘
+                 │
+                 ▼
+        ┌─────────────────┐
+        │ Machine Learning│
+        │   Localization  │
+        └────────┬────────┘
+                 │
+                 ▼
+        ┌─────────────────┐
+        │ Current Location│
+        │    Prediction   │
+        └────────┬────────┘
+                 │
+                 └──────────────► Navigation
+>>>>>>> 95624f4ddac893698aa4d639f2f6ef1d471ed30c
