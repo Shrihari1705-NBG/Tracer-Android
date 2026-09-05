@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.shrihari.smartcampusnavigator.data.ble.BleScannerManager
 import com.shrihari.smartcampusnavigator.data.datastore.SettingsDataStore
 import com.shrihari.smartcampusnavigator.data.localization.LocalizationRepository
+import com.shrihari.smartcampusnavigator.data.ml.OnnxLocalizationManager
 import com.shrihari.smartcampusnavigator.data.navigation.NodeNameMapper
 import com.shrihari.smartcampusnavigator.data.navigation.repository.NavigationRepository
 import com.shrihari.smartcampusnavigator.domain.repository.HomeRepository
@@ -25,13 +26,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+
     private val repository: HomeRepository,
+
     private val bluetoothManager: BluetoothManager,
+
     private val bleScannerManager: BleScannerManager,
+
     private val localizationRepository: LocalizationRepository,
+
     private val navigationRepository: NavigationRepository,
-    private val settingsDataStore: SettingsDataStore
+
+    private val settingsDataStore: SettingsDataStore,
+
+    private val onnxLocalizationManager: OnnxLocalizationManager
+
 ) : ViewModel() {
+
 
     private val _uiState =
         MutableStateFlow(HomeUiState())
@@ -161,27 +172,7 @@ class HomeViewModel @Inject constructor(
 
 
     // =========================================================================
-    // BLE BEACON STATUS
-    // =========================================================================
-    //
-    // IMPORTANT:
-    //
-    // ONNX localization has intentionally been removed from this stage.
-    //
-    // We are currently collecting the new fingerprint dataset using:
-    //
-    // 15 Beacons
-    // B1 ... B15
-    //
-    // 28 Nodes
-    // N1 ... N28
-    //
-    // The old ONNX model expected 7 inputs and therefore caused a crash
-    // when the new 15-dimensional RSSI vector was passed to it.
-    //
-    // The scanner itself remains active.
-    // Only ML prediction has been disabled.
-    //
+    // BLE BEACON STATUS + ONNX LOCALIZATION
     // =========================================================================
 
     private fun observeBeaconStatus() {
@@ -189,6 +180,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
 
             bleScannerManager.devices.collect { devices ->
+
 
                 // -----------------------------------------------------------------
                 // Beacon Detection Status
@@ -213,16 +205,96 @@ class HomeViewModel @Inject constructor(
                 // -----------------------------------------------------------------
                 // Update Scanner Status
                 // -----------------------------------------------------------------
-                //
-                // No ONNX prediction is performed here.
-                //
-                // -----------------------------------------------------------------
 
                 _uiState.update {
 
                     it.copy(
                         scannerStatus = status
                     )
+                }
+
+
+                // -----------------------------------------------------------------
+                // Do not run localization when Bluetooth is disabled
+                // -----------------------------------------------------------------
+
+                if (!_uiState.value.bluetoothEnabled) {
+                    return@collect
+                }
+
+
+                // -----------------------------------------------------------------
+                // Do not run localization when no beacons are detected
+                // -----------------------------------------------------------------
+
+                if (devices.isEmpty()) {
+                    return@collect
+                }
+
+
+                // -----------------------------------------------------------------
+                // BUILD 15-DIMENSION RSSI VECTOR
+                // -----------------------------------------------------------------
+                //
+                // Model feature order:
+                //
+                // B1
+                // B2
+                // B3
+                // ...
+                // B15
+                //
+                // Missing beacons are represented as -100 dBm.
+                //
+                // Scanner names:
+                //
+                // TRACER_B1
+                // TRACER_B2
+                // ...
+                // TRACER_B15
+                //
+                // -----------------------------------------------------------------
+
+                val rssiVector =
+                    FloatArray(15) { index ->
+
+                        val beaconName =
+                            "TRACER_B${index + 1}"
+
+                        devices
+                            .firstOrNull {
+                                it.name == beaconName
+                            }
+                            ?.rssi
+                            ?.toFloat()
+                            ?: -100f
+                    }
+
+
+                // -----------------------------------------------------------------
+                // RUN RANDOM FOREST ONNX MODEL
+                // -----------------------------------------------------------------
+
+                try {
+
+                    val predictedNode =
+                        onnxLocalizationManager.predictNode(
+                            rssiVector
+                        )
+
+
+                    // -------------------------------------------------------------
+                    // Update Localization Repository
+                    // -------------------------------------------------------------
+
+                    localizationRepository.updateCurrentNode(
+                        predictedNode
+                    )
+
+
+                } catch (exception: Exception) {
+
+                    exception.printStackTrace()
                 }
             }
         }

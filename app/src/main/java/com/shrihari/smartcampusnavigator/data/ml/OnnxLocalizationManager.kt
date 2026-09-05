@@ -17,47 +17,58 @@ class OnnxLocalizationManager @Inject constructor(
 
 ) {
 
-    private val environment = OrtEnvironment.getEnvironment()
+    private val environment =
+        OrtEnvironment.getEnvironment()
 
     private val session: OrtSession
 
     init {
 
-        val modelBytes = context.assets
-            .open("random_forest_model.onnx")
-            .readBytes()
+        val modelBytes =
+            context.assets
+                .open("random_forest_model.onnx")
+                .readBytes()
 
-        session = environment.createSession(modelBytes)
-
+        session =
+            environment.createSession(modelBytes)
     }
+
 
     fun predictNode(
         rssi: FloatArray
     ): String {
 
-        val inputTensor = OnnxTensor.createTensor(
+        require(rssi.size == 15) {
+            "Random Forest ONNX model requires 15 RSSI features, but received ${rssi.size}"
+        }
 
-            environment,
-
-            FloatBuffer.wrap(rssi),
-
-            longArrayOf(1, 7)
-
-        )
-
-        val result = session.run(
-
-            mapOf(
-                "float_input" to inputTensor
+        val inputTensor =
+            OnnxTensor.createTensor(
+                environment,
+                FloatBuffer.wrap(rssi),
+                longArrayOf(1, 15)
             )
 
-        )
+        inputTensor.use {
 
-        val prediction = result[0].value as LongArray
+            val result =
+                session.run(
+                    mapOf(
+                        "input" to inputTensor
+                    )
+                )
 
-        val predictedClass = prediction[0].toInt()
+            result.use {
 
-        return "N${predictedClass + 13}"
+                val output =
+                    result[0].value
+
+                @Suppress("UNCHECKED_CAST")
+                val predictions =
+                    output as Array<String>
+
+                return predictions[0]
+            }
+        }
     }
-
 }
