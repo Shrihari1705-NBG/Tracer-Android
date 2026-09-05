@@ -64,7 +64,7 @@ class ScanViewModel @Inject constructor(
      * Session 4 = fourth collection session
      * Session 5 = fifth collection session
      */
-    private var currentSession = 1
+    private var currentSession = 2
 
     init {
         observeBluetoothState()

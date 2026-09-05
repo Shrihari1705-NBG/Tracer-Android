@@ -1,55 +1,71 @@
 package com.shrihari.smartcampusnavigator.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
 import com.shrihari.smartcampusnavigator.data.ble.BleScannerManager
 import com.shrihari.smartcampusnavigator.data.datastore.SettingsDataStore
 import com.shrihari.smartcampusnavigator.data.localization.LocalizationRepository
-import com.shrihari.smartcampusnavigator.data.ml.OnnxLocalizationManager
 import com.shrihari.smartcampusnavigator.data.navigation.NodeNameMapper
 import com.shrihari.smartcampusnavigator.data.navigation.repository.NavigationRepository
 import com.shrihari.smartcampusnavigator.domain.repository.HomeRepository
 import com.shrihari.smartcampusnavigator.ui.components.BottomNavItem
 import com.shrihari.smartcampusnavigator.ui.screens.home.HomeUiState
 import com.shrihari.smartcampusnavigator.utils.BluetoothManager
+
 import dagger.hilt.android.lifecycle.HiltViewModel
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
 import javax.inject.Inject
+
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: HomeRepository,
     private val bluetoothManager: BluetoothManager,
     private val bleScannerManager: BleScannerManager,
-    private val onnxLocalizationManager: OnnxLocalizationManager,
     private val localizationRepository: LocalizationRepository,
     private val navigationRepository: NavigationRepository,
     private val settingsDataStore: SettingsDataStore
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _uiState =
+        MutableStateFlow(HomeUiState())
+
+    val uiState =
+        _uiState.asStateFlow()
+
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
 
     init {
+
         loadWelcomeMessage()
+
         observeBluetoothState()
+
         observeBeaconStatus()
+
         observeNavigationState()
     }
 
-    // ---------------------------------------------------------
-    // Welcome Message
-    // ---------------------------------------------------------
+
+    // =========================================================================
+    // WELCOME MESSAGE
+    // =========================================================================
 
     private fun loadWelcomeMessage() {
 
         viewModelScope.launch {
 
-            val message = repository.getWelcomeMessage()
+            val message =
+                repository.getWelcomeMessage()
 
             _uiState.update {
 
@@ -60,15 +76,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // ---------------------------------------------------------
-    // Observe Navigation State
-    // ---------------------------------------------------------
+
+    // =========================================================================
+    // NAVIGATION STATE
+    // =========================================================================
 
     private fun observeNavigationState() {
 
-        // -----------------------------------------------------
+        // ---------------------------------------------------------------------
         // Live Current Location
-        // -----------------------------------------------------
+        // ---------------------------------------------------------------------
 
         viewModelScope.launch {
 
@@ -84,9 +101,10 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // -----------------------------------------------------
+
+        // ---------------------------------------------------------------------
         // Persisted Recent Destination
-        // -----------------------------------------------------
+        // ---------------------------------------------------------------------
 
         viewModelScope.launch {
 
@@ -102,9 +120,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // ---------------------------------------------------------
-    // Navigate to Recent Destination
-    // ---------------------------------------------------------
+
+    // =========================================================================
+    // NAVIGATE TO RECENT DESTINATION
+    // =========================================================================
 
     fun navigateToRecentDestination() {
 
@@ -119,9 +138,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // ---------------------------------------------------------
-    // Bluetooth State
-    // ---------------------------------------------------------
+
+    // =========================================================================
+    // BLUETOOTH STATE
+    // =========================================================================
 
     private fun observeBluetoothState() {
 
@@ -139,9 +159,30 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // ---------------------------------------------------------
-    // BLE + ML Localization
-    // ---------------------------------------------------------
+
+    // =========================================================================
+    // BLE BEACON STATUS
+    // =========================================================================
+    //
+    // IMPORTANT:
+    //
+    // ONNX localization has intentionally been removed from this stage.
+    //
+    // We are currently collecting the new fingerprint dataset using:
+    //
+    // 15 Beacons
+    // B1 ... B15
+    //
+    // 28 Nodes
+    // N1 ... N28
+    //
+    // The old ONNX model expected 7 inputs and therefore caused a crash
+    // when the new 15-dimensional RSSI vector was passed to it.
+    //
+    // The scanner itself remains active.
+    // Only ML prediction has been disabled.
+    //
+    // =========================================================================
 
     private fun observeBeaconStatus() {
 
@@ -149,9 +190,9 @@ class HomeViewModel @Inject constructor(
 
             bleScannerManager.devices.collect { devices ->
 
-                // -------------------------------------------------
+                // -----------------------------------------------------------------
                 // Beacon Detection Status
-                // -------------------------------------------------
+                // -----------------------------------------------------------------
 
                 val status = when {
 
@@ -168,164 +209,29 @@ class HomeViewModel @Inject constructor(
                         "${devices.size} Beacons Detected"
                 }
 
-                // -------------------------------------------------
-                // Build 15-Dimensional RSSI Vector
+
+                // -----------------------------------------------------------------
+                // Update Scanner Status
+                // -----------------------------------------------------------------
                 //
-                // B1  -> index 0
-                // B2  -> index 1
-                // ...
-                // B15 -> index 14
+                // No ONNX prediction is performed here.
                 //
-                // Missing beacon = -100
-                // -------------------------------------------------
-
-                val rssiVector =
-                    FloatArray(15) { -100f }
-
-                devices.forEach { device ->
-
-                    when (device.name) {
-
-                        "TRACER_B1" ->
-                            rssiVector[0] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B2" ->
-                            rssiVector[1] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B3" ->
-                            rssiVector[2] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B4" ->
-                            rssiVector[3] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B5" ->
-                            rssiVector[4] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B6" ->
-                            rssiVector[5] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B7" ->
-                            rssiVector[6] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B8" ->
-                            rssiVector[7] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B9" ->
-                            rssiVector[8] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B10" ->
-                            rssiVector[9] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B11" ->
-                            rssiVector[10] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B12" ->
-                            rssiVector[11] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B13" ->
-                            rssiVector[12] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B14" ->
-                            rssiVector[13] =
-                                device.rssi.toFloat()
-
-                        "TRACER_B15" ->
-                            rssiVector[14] =
-                                device.rssi.toFloat()
-                    }
-                }
-
-                // -------------------------------------------------
-                // Debug RSSI Vector
-                // -------------------------------------------------
-
-                Log.d(
-                    "TRACER_ML",
-                    "RSSI(15) = ${rssiVector.joinToString()}"
-                )
-
-                // -------------------------------------------------
-                // Wait Until At Least One Tracer Beacon
-                // -------------------------------------------------
-
-                if (devices.isEmpty()) {
-
-                    _uiState.update {
-
-                        it.copy(
-                            scannerStatus = status,
-                            predictedNode =
-                                "Waiting for Beacons..."
-                        )
-                    }
-
-                    return@collect
-                }
-
-                // -------------------------------------------------
-                // Predict Current Node
-                // -------------------------------------------------
-
-                /*
-                 * IMPORTANT:
-                 *
-                 * The ONNX model currently installed in the
-                 * application must accept 15 input features.
-                 *
-                 * Until the final 15-beacon model is trained
-                 * and exported, this call will not work with
-                 * the old 7-feature model.
-                 */
-
-                val predictedNode =
-                    onnxLocalizationManager.predictNode(
-                        rssiVector
-                    )
-
-                // -------------------------------------------------
-                // Update Localization Repository
-                // -------------------------------------------------
-
-                localizationRepository.updateCurrentNode(
-                    predictedNode
-                )
-
-                Log.d(
-                    "TRACER_ML",
-                    "Prediction = $predictedNode"
-                )
-
-                // -------------------------------------------------
-                // Update UI
-                // -------------------------------------------------
+                // -----------------------------------------------------------------
 
                 _uiState.update {
 
                     it.copy(
-                        scannerStatus = status,
-                        predictedNode = predictedNode
+                        scannerStatus = status
                     )
                 }
             }
         }
     }
 
-    // ---------------------------------------------------------
-    // Actual Node Selection
-    // ---------------------------------------------------------
+
+    // =========================================================================
+    // ACTUAL NODE SELECTION
+    // =========================================================================
 
     fun onActualNodeSelected(node: String) {
 
@@ -337,23 +243,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // ---------------------------------------------------------
-    // Start Scan
-    // ---------------------------------------------------------
+
+    // =========================================================================
+    // START SCAN
+    // =========================================================================
 
     fun onStartScan() {
 
-        Log.d(
-            "HOME_SCAN",
-            "Start Scan Button Pressed"
-        )
-
         if (!_uiState.value.bluetoothEnabled) {
-
-            Log.d(
-                "HOME_SCAN",
-                "Bluetooth OFF"
-            )
 
             return
         }
@@ -361,9 +258,10 @@ class HomeViewModel @Inject constructor(
         bleScannerManager.startScan()
     }
 
-    // ---------------------------------------------------------
-    // Bottom Navigation
-    // ---------------------------------------------------------
+
+    // =========================================================================
+    // BOTTOM NAVIGATION
+    // =========================================================================
 
     fun onBottomNavSelected(
         item: BottomNavItem

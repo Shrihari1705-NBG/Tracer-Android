@@ -1,5 +1,12 @@
 package com.shrihari.smartcampusnavigator.ui.screens.scan
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.widget.Toast
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +35,7 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -65,6 +73,118 @@ fun ScanScreen(
     val uiState =
         viewModel.uiState.collectAsStateWithLifecycle()
 
+    // =========================================================================
+    // BLE PERMISSION LAUNCHER
+    // =========================================================================
+
+    val blePermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+
+            val allGranted =
+                permissions.values.all { granted ->
+                    granted
+                }
+
+            if (allGranted) {
+
+                // Permission granted → start scanning
+                viewModel.toggleScan()
+
+            } else {
+
+                // Permission denied → do not start scanning
+                Toast.makeText(
+                    navController.context,
+                    "Bluetooth permission is required to scan for Tracer beacons.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+    // =========================================================================
+    // START SCAN HANDLER
+    // =========================================================================
+
+    fun handleScanButtonClick() {
+
+        // -------------------------------------------------------------
+        // If already scanning → stop immediately.
+        // No permission request is needed.
+        // -------------------------------------------------------------
+
+        if (uiState.value.isScanning) {
+
+            viewModel.toggleScan()
+
+            return
+        }
+
+        // -------------------------------------------------------------
+        // Bluetooth must be enabled first.
+        // -------------------------------------------------------------
+
+        if (!uiState.value.bluetoothEnabled) {
+
+            viewModel.toggleScan()
+
+            return
+        }
+
+        // -------------------------------------------------------------
+        // Determine required runtime permissions.
+        // -------------------------------------------------------------
+
+        val requiredPermissions =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                )
+
+            } else {
+
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            }
+
+        // -------------------------------------------------------------
+        // Check whether all required permissions are already granted.
+        // -------------------------------------------------------------
+
+        val permissionsGranted =
+            requiredPermissions.all { permission ->
+
+                ContextCompat.checkSelfPermission(
+                    navController.context,
+                    permission
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+        // -------------------------------------------------------------
+        // Permission already granted → start scanning.
+        // -------------------------------------------------------------
+
+        if (permissionsGranted) {
+
+            viewModel.toggleScan()
+
+        } else {
+
+            // ---------------------------------------------------------
+            // Permission not granted → request from Android.
+            // ---------------------------------------------------------
+
+            blePermissionLauncher.launch(
+                requiredPermissions
+            )
+        }
+    }
+
+
     ScanScreenContent(
 
         navController = navController,
@@ -73,7 +193,11 @@ fun ScanScreen(
 
         viewModel = viewModel,
 
-        tutorialManager = tutorialManager
+        tutorialManager = tutorialManager,
+
+        onScanButtonClick = {
+            handleScanButtonClick()
+        }
     )
 }
 
@@ -87,7 +211,8 @@ private fun ScanScreenContent(
     navController: NavController,
     uiState: ScanUiState,
     viewModel: ScanViewModel,
-    tutorialManager: TutorialManager
+    tutorialManager: TutorialManager,
+    onScanButtonClick: () -> Unit
 ) {
 
     // =========================================================================
@@ -371,7 +496,7 @@ private fun ScanScreenContent(
 
                 onClick = {
 
-                    viewModel.toggleScan()
+                    onScanButtonClick()
                 }
             )
 
